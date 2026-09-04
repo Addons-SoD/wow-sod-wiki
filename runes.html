@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>符文指南 · 魔兽世界探索赛季 Wiki</title>
+  <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理各符文效果与获取方式" />
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --text: #d8dee9;
+      --muted: #8b93a3;
+      --accent: #c8a24b;
+      --link: #6cb6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(180deg, #1b1f27, #0f1115);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 1rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 0.4rem; font-size: 1.8rem; color: var(--accent); }
+    header p { margin: 0; color: var(--muted); }
+    header a { color: var(--link); font-size: 0.9rem; }
+    main { max-width: 900px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .notice {
+      background: #1d242e;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 1.5rem;
+    }
+    #class-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+    #class-tabs button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    #class-tabs button:hover { border-color: var(--accent); }
+    #class-tabs button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: #1c2029;
+      color: var(--accent);
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    td.rune-name { color: var(--link); font-weight: 600; white-space: nowrap; }
+    td.slot { white-space: nowrap; color: var(--muted); }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 2.5rem 1rem !important;
+    }
+    .phase-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.05rem 0.5rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>探索赛季 · 符文指南</h1>
+    <p>按职业与装备槽位整理各符文的解锁、效果与获取方式</p>
+    <a href="./">← 返回 Wiki 首页</a>
+  </header>
+
+  <main>
+    <div class="notice">
+      符文（Rune）铭刻于特定装备槽位，为职业带来全新技能与被动。本页按
+      <strong>职业 → 槽位</strong> 组织，数据整理自玩家社区资料，正在逐步填充中。
+    </div>
+
+    <div id="class-tabs"></div>
+
+    <table id="rune-table">
+      <thead>
+        <tr><th>槽位</th><th>符文名称</th><th>效果说明</th><th>获取 / 解锁方式</th><th>阶段</th></tr>
+      </thead>
+      <tbody id="rune-body"></tbody>
+    </table>
+  </main>
+
+  <footer>
+    <p>本 Wiki 为玩家社区项目，与暴雪娱乐（Blizzard Entertainment）无隶属关系。</p>
+  </footer>
+
+  <script>
+    // 数据格式：[槽位, 符文名, 效果说明, 获取方式, 阶段(P1/P2/P3/P4/P5)]
+    const RUNES = {
+      "战士": [],
+      "圣骑士": [],
+      "猎人": [],
+      "潜行者": [],
+      "牧师": [],
+      "萨满祭司": [],
+      "法师": [],
+      "术士": [],
+      "德鲁伊": []
+    };
+
+    const CLASS_TABS = ["战士", "圣骑士", "猎人", "潜行者", "牧师", "萨满祭司", "法师", "术士", "德鲁伊"];
+    let current = CLASS_TABS[0];
+
+    function renderTabs() {
+      const box = document.getElementById("class-tabs");
+      box.innerHTML = "";
+      CLASS_TABS.forEach(function (cls) {
+        const btn = document.createElement("button");
+        btn.textContent = cls;
+        btn.className = cls === current ? "active" : "";
+        btn.onclick = function () { current = cls; renderTabs(); renderTable(); };
+        box.appendChild(btn);
+      });
+    }
+
+    function renderTable() {
+      const body = document.getElementById("rune-body");
+      const rows = RUNES[current] || [];
+      body.innerHTML = "";
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5;
+        td.className = "empty";
+        td.textContent = "「" + current + "」的符文数据整理中，敬请期待。";
+        tr.appendChild(td);
+        body.appendChild(tr);
+        return;
+      }
+      rows.forEach(function (r) {
+        const tr = document.createElement("tr");
+        [r[0], r[1], r[2], r[3], r[4]].forEach(function (cell, i) {
+          const td = document.createElement("td");
+          if (i === 1) td.className = "rune-name";
+          if (i === 0) td.className = "slot";
+          if (i === 4) {
+            const span = document.createElement("span");
+            span.className = "phase-tag";
+            span.textContent = cell || "-";
+            td.appendChild(span);
+          } else {
+            td.textContent = cell || "-";
+          }
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    renderTabs();
+    renderTable();
+  </script>
+</body>
+</html>
