@@ -30,6 +30,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
+  transform: translateZ(0); /* 提升为独立合成层，减少滚动/跳转时重绘 */
   background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("bg.jpeg");
   background-repeat: repeat, no-repeat;
   background-size: auto, cover;
@@ -133,6 +134,10 @@ a { color: var(--link); }
 .card p { margin: 0; font-size: 0.88rem; color: var(--muted); }
 ul.toc { padding-left: 1.2rem; }
 ul.toc li { margin: 0.35rem 0; }
+
+/* 子页（符文指南等）顶部条：标题文字较短时放大一档，与首页观感平衡 */
+.hero-sub .hero-card h1 { font-size: 1.4rem; }
+.hero-sub .hero-card p { font-size: 0.9rem; }
 
 /* ---- 符文指南页 ---- */
 #class-tabs {
