@@ -18,13 +18,18 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("assets/bg.jpeg");
+      background-size: cover, cover;
+      background-repeat: repeat, no-repeat;
+      background-position: center;
+      background-attachment: fixed;
       color: var(--text);
       font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
       line-height: 1.7;
     }
     header {
-      background: linear-gradient(180deg, #1b1f27, #0f1115);
+      background: linear-gradient(180deg, rgba(14, 17, 23, 0.94), rgba(10, 12, 17, 0.66));
       border-bottom: 1px solid var(--border);
       padding: 2rem 1rem 1.5rem;
       text-align: center;
