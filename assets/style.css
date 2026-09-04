@@ -201,6 +201,18 @@ footer {
   border-top: 1px solid var(--border);
   padding: 1.5rem 1rem;
 }
+/* 页脚版本徽章 */
+.site-version {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.02rem 0.6rem;
+  border: 1px solid rgba(200, 162, 75, 0.4);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  color: var(--accent);
+  vertical-align: middle;
+  white-space: nowrap;
+}
 
 /* 窄屏适配：返回链接改为标题上方的居中小行，避免遮挡 */
 @media (max-width: 680px) {
