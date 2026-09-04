@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>魔兽世界探索赛季 Wiki</title>
+  <meta name="description" content="魔兽世界怀旧服 · 探索赛季（Season of Discovery, SoD）玩家资料 Wiki" />
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a2f3a;
+      --text: #d8dee9;
+      --muted: #8b93a3;
+      --accent: #c8a24b;
+      --link: #6cb6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(180deg, #1b1f27, #0f1115);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 1rem 2.5rem;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 0.5rem; font-size: 2.2rem; color: var(--accent); }
+    header p { margin: 0; color: var(--muted); }
+    main { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    .notice {
+      background: #1d242e;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 0.9rem 1.1rem;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    h2 {
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin-top: 2.4rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s;
+      display: block;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card h3 { margin: 0 0 0.4rem; font-size: 1.05rem; color: var(--link); }
+    .card p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+    ul.toc { padding-left: 1.2rem; }
+    ul.toc li { margin: 0.35rem 0; }
+    a { color: var(--link); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>魔兽世界 · 探索赛季 Wiki</h1>
+    <p>World of Warcraft Classic — Season of Discovery (SoD) 玩家资料站</p>
+  </header>
+
+  <main>
+    <div class="notice">
+      本站目前为初始骨架页面，正在逐步建设。内容仅供玩家参考，欢迎通过 Pull Request 一起补充、修正。
+    </div>
+
+    <h2>什么是探索赛季？</h2>
+    <p>
+      <strong>探索赛季（Season of Discovery，简称 SoD）</strong> 是《魔兽世界》怀旧服于 2023 年底推出的全新赛季制玩法。
+      它以 25 级、40 级、50 级、60 级阶段推进，核心特色包括：
+    </p>
+    <ul class="toc">
+      <li><strong>符文系统：</strong> 每个职业都有可发现、可铭刻的符文，为经典天赋注入全新技能与玩法。</li>
+      <li><strong>探索与解谜：</strong> 大量职业符文与隐藏任务散布在艾泽拉斯各处，需要组队探索与解密。</li>
+      <li><strong>十人团本：</strong> 熔火之心、奥妮克希亚的巢穴等以 10 人规模重制，并加入全新 Boss 与机制。</li>
+      <li><strong>全新内容：</strong> 黑暗深渊、沉没的神庙、祖尔格拉布、卡拉赞墓穴等阶段化新团队副本，以及更新后的 PvP 战场玩法。</li>
+    </ul>
+
+    <h2>资料导航</h2>
+    <div class="grid">
+      <a class="card" href="#"><h3>职业指南</h3><p>符文解锁路线、各职业 Build 与手法（建设中）</p></a>
+      <a class="card" href="#"><h3>副本攻略</h3><p>团队副本与五人本 Boss 机制、掉落速查（建设中）</p></a>
+      <a class="card" href="#"><h3>事件与活动</h3><p>梦魇入侵、鲜血圣像等世界事件时间线（建设中）</p></a>
+      <a class="card" href="#"><h3>装备数据库</h3><p>阶段 Bis 装备与获取途径整理（建设中）</p></a>
+      <a class="card" href="#"><h3>更新日志</h3><p>官方蓝贴要点与赛季补丁变更记录（建设中）</p></a>
+      <a class="card" href="https://github.com/Addons-SoD/wow-sod-wiki"><h3>参与贡献</h3><p>仓库源码、Issue 与 Pull Request 入口</p></a>
+    </div>
+
+    <h2>相关链接</h2>
+    <ul class="toc">
+      <li><a href="https://worldofwarcraft.blizzard.com/zh-cn/news" rel="noopener">魔兽世界官方网站</a></li>
+      <li><a href="https://us.forums.blizzard.com/en/wow/c/classic-season-of-discovery" rel="noopener">官方探索赛季论坛（英文）</a></li>
+      <li><a href="https://www.wowhead.com/classic/season-of-discovery" rel="noopener">Wowhead Season of Discovery（英文）</a></li>
+    </ul>
+  </main>
+
+  <footer>
+    <p>本 Wiki 为玩家社区项目，与暴雪娱乐（Blizzard Entertainment）无隶属关系。魔兽世界相关素材版权归其所有者所有。</p>
+  </footer>
+</body>
+</html>
