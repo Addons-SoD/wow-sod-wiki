@@ -5,121 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>符文指南 · 魔兽世界探索赛季 Wiki</title>
   <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理各符文效果与获取方式" />
-  <style>
-    :root {
-      --bg: #0f1115;
-      --panel: #171a21;
-      --border: #2a2f3a;
-      --text: #d8dee9;
-      --muted: #8b93a3;
-      --accent: #c8a24b;
-      --link: #6cb6ff;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background-color: var(--bg);
-      background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("assets/bg.jpeg");
-      background-size: cover, cover;
-      background-repeat: repeat, no-repeat;
-      background-position: center;
-      background-attachment: fixed;
-      color: var(--text);
-      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-      line-height: 1.7;
-    }
-    header {
-      background: linear-gradient(180deg, rgba(14, 17, 23, 0.94), rgba(10, 12, 17, 0.66));
-      border-bottom: 1px solid var(--border);
-      padding: 2rem 1rem 1.5rem;
-      text-align: center;
-    }
-    header h1 { margin: 0 0 0.4rem; font-size: 1.8rem; color: var(--accent); }
-    header p { margin: 0; color: var(--muted); }
-    header a { color: var(--link); font-size: 0.9rem; }
-    main { max-width: 900px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-    .notice {
-      background: #1d242e;
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      padding: 0.8rem 1rem;
-      border-radius: 6px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-bottom: 1.5rem;
-    }
-    #class-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.2rem;
-    }
-    #class-tabs button {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.45rem 0.9rem;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    #class-tabs button:hover { border-color: var(--accent); }
-    #class-tabs button.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      font-weight: 600;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      text-align: left;
-      padding: 0.7rem 0.9rem;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-    th {
-      background: #1c2029;
-      color: var(--accent);
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-    tr:last-child td { border-bottom: none; }
-    td.rune-name { color: var(--link); font-weight: 600; white-space: nowrap; }
-    td.slot { white-space: nowrap; color: var(--muted); }
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 2.5rem 1rem !important;
-    }
-    .phase-tag {
-      display: inline-block;
-      font-size: 0.75rem;
-      padding: 0.05rem 0.5rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 1rem;
-    }
-  </style>
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <header>
-    <h1>探索赛季 · 符文指南</h1>
-    <p>按职业与装备槽位整理各符文的解锁、效果与获取方式</p>
-    <a href="./">← 返回 Wiki 首页</a>
+  <header class="hero">
+    <div class="hero-card">
+      <a class="hero-back" href="./">← 返回 Wiki 首页</a>
+      <h1>探索赛季 · 符文指南</h1>
+      <p>按职业与装备槽位整理各符文的解锁、效果与获取方式</p>
+    </div>
   </header>
 
   <main>
