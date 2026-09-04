@@ -73,6 +73,14 @@ body::before {
   font-size: 0.85rem;
   color: var(--muted);
 }
+/* 顶部悬浮条内的小 Logo（白底透明 PNG） */
+.hero-logo {
+  display: block;
+  height: 28px;
+  width: auto;
+  margin: 0 auto 0.15rem;
+  opacity: 0.96;
+}
 /* 子页面“返回首页”链接：桌面端悬浮于卡内左侧中部 */
 .hero-back {
   position: absolute;
