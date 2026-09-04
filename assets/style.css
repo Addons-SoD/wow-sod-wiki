@@ -12,19 +12,28 @@
   --link: #6cb6ff;
   --content-w: 860px; /* 正文内容列宽，悬浮条与之对齐 */
 }
+html { overflow-y: scroll; } /* 稳定滚动条，避免页面切换/滚动时内容宽度跳动 */
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background-color: var(--bg);
-  background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("bg.jpeg");
-  background-size: cover, cover;
-  background-repeat: repeat, no-repeat;
-  background-position: center;
-  background-attachment: fixed;
+  background-color: var(--bg); /* 纯色兜底（背景图加载失败时） */
   color: var(--text);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   line-height: 1.7;
+}
+
+/* 固定背景层：用独立 fixed 层代替 background-attachment: fixed，
+   避免跨页面跳转 / 滚动时 cover 背景被重新布局导致的抖动、放大缩小 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("bg.jpeg");
+  background-repeat: repeat, no-repeat;
+  background-size: auto, cover;
+  background-position: center;
 }
 
 /* 顶部悬浮标题条：滚动页面时始终固定在视口顶部，宽度与正文内容列一致 */
