@@ -28,40 +28,41 @@
       font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
       line-height: 1.7;
     }
-    /* 首屏悬浮标题块：缩小占比，半透明毛玻璃小卡悬浮于背景之上 */
-    /* 如需滚动页面时始终固定悬浮（fixed），把 .hero 改为 fixed 定位并去掉 min-height 即可 */
+    /* 顶部悬浮标题条：滚动页面时始终固定在视口顶部，宽度与正文内容列一致 */
     .hero {
-      min-height: 58vh;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 1.5rem 1rem;
+      padding: 0.55rem 1.25rem;
+      background: rgba(9, 11, 16, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .hero-card {
-      max-width: 540px;
       width: 100%;
-      padding: 0.85rem 2.4rem 1.1rem;
-      border-radius: 14px;
+      max-width: 860px; /* 与 main 内容列同宽 */
+      margin: 0 auto;
+      padding: 0.45rem 1.6rem 0.55rem;
+      border-radius: 10px;
       text-align: center;
-      background: rgba(10, 13, 19, 0.6);
-      border: 1px solid rgba(200, 162, 75, 0.32);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(14, 17, 23, 0.7);
+      border: 1px solid rgba(200, 162, 75, 0.3);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
     .hero-card h1 {
-      margin: 0 0 0.4rem;
-      font-size: 1.45rem;
-      letter-spacing: 0.04em;
+      margin: 0;
+      font-size: 1.12rem;
+      letter-spacing: 0.05em;
       color: var(--accent);
-      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
     }
     .hero-card p {
-      margin: 0;
-      font-size: 0.82rem;
+      margin: 0.05rem 0 0;
+      font-size: 0.78rem;
       color: var(--muted);
     }
-    main { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
     .notice {
       background: #1d242e;
       border: 1px solid var(--border);
