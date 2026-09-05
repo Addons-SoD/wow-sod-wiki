@@ -263,10 +263,12 @@ tr:last-child td { border-bottom: none; }
   color: var(--text);
   white-space: normal;
 }
-/* 获取方式：展示框下方，普通样式、非框 */
+/* 获取方式：置于展示框内，用水平分隔线与效果区隔 */
 .rune-acquire {
-  margin: 0.5rem 0 0;
-  padding-left: 0.35rem;
+  margin: 0;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(200, 162, 75, 0.25);
   font-size: 0.85rem;
   line-height: 1.65;
   color: var(--muted);
