@@ -97,7 +97,7 @@
 
     function matches(r, q) {
       if (!q) return true;
-      var hay = [r.name_zh, r.name_en, r.item_zh, r.desc_zh, r.source_zh].join(" ").toLowerCase();
+      var hay = [r.name_zh, r.item_zh, r.desc_zh, r.source_zh].join(" ").toLowerCase();
       return q.toLowerCase().split(/\s+/).every(function (t) { return hay.indexOf(t) >= 0; });
     }
 
@@ -133,7 +133,6 @@
             + '<header class="rune-head">'
             + "<h3>" + esc(r.name_zh) + "</h3>"
             + '<div class="rune-sub">'
-            + (r.name_en ? '<span class="rune-en">' + esc(r.name_en) + "</span>" : "")
             + badge
             + "</div></header>"
             + '<p class="rune-desc">' + fmt(r.desc_zh) + "</p>"
