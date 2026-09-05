@@ -125,21 +125,15 @@
       var html = "";
       groups.forEach(function (g) {
         html += '<h2 class="slot-h">' + esc(g.zh) + ' <span>' + g.runes.length + " 条</span></h2>";
-        html += '<div class="rune-grid">';
         g.runes.forEach(function (r) {
-          var badge = (r.item_zh && r.item_zh !== r.name_zh)
-            ? '<span class="rune-item">' + esc(r.item_zh) + "</span>" : "";
-          html += '<article class="rune-card ' + qClass(r.quality) + '">'
-            + '<header class="rune-head">'
-            + "<h3>" + esc(r.name_zh) + "</h3>"
-            + '<div class="rune-sub">'
-            + badge
-            + "</div></header>"
+          html += '<div class="rune-showcase">'
+            + '<article class="rune-card">'
+            + '<header class="rune-head"><h3>' + esc(r.name_zh) + "</h3></header>"
             + '<p class="rune-desc">' + fmt(r.desc_zh) + "</p>"
-            + (r.source_zh ? '<p class="rune-src"><b>获取方式</b><span>' + fmt(r.source_zh) + "</span></p>" : "")
-            + "</article>";
+            + "</article>"
+            + (r.source_zh ? '<p class="rune-acquire"><b>获取方式</b>' + fmt(r.source_zh) + "</p>" : "")
+            + "</div>";
         });
-        html += "</div>";
       });
       box.innerHTML = html;
     }

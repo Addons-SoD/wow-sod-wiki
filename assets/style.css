@@ -230,71 +230,53 @@ tr:last-child td { border-bottom: none; }
 }
 .slot-h span { font-size: 0.8rem; color: var(--muted); font-weight: normal; }
 
-/* 符文卡片 */
-.rune-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 0.9rem;
+/* 符文展示（游戏 tooltip 风格：深色半透明 + 古铜描边框） */
+/* 每个符文一个与内容列等宽的展示框，获取方式放在框外下方 */
+.rune-showcase {
+  margin: 0 0 1.15rem;
 }
 .rune-card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--muted);
-  border-radius: 8px;
-  padding: 0.85rem 1rem 0.9rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
+  background: linear-gradient(180deg, rgba(16, 17, 23, 0.94), rgba(8, 9, 13, 0.92));
+  border: 1px solid rgba(200, 162, 75, 0.45);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+              0 0 0 1px rgba(120, 84, 40, 0.35),
+              0 6px 22px rgba(0, 0, 0, 0.45);
+  padding: 0.85rem 1.1rem 0.9rem;
 }
-.rune-card.q-common { border-left-color: #9d9d9d; }
-.rune-card.q-uncommon { border-left-color: #1eff00; }
-.rune-card.q-rare { border-left-color: #0070dd; }
-.rune-card.q-epic { border-left-color: #a335ee; }
-.rune-card.q-none { border-left-color: var(--muted); }
+.rune-head {
+  border-bottom: 1px solid rgba(200, 162, 75, 0.28);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+}
 .rune-head h3 {
   margin: 0;
-  font-size: 1.06rem;
-  color: var(--text);
-  letter-spacing: 0.02em;
-}
-.rune-sub {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
-}
-.rune-en { font-size: 0.8rem; color: var(--muted); }
-.rune-item {
-  font-size: 0.75rem;
-  color: var(--link);
-  border: 1px solid rgba(108, 182, 255, 0.35);
-  border-radius: 10px;
-  padding: 0 0.5rem;
+  font-size: 1.12rem;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 .rune-desc {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.65;
+  font-size: 0.92rem;
+  line-height: 1.7;
   color: var(--text);
   white-space: normal;
 }
-.rune-src {
-  margin: 0;
-  border-top: 1px dashed var(--border);
-  padding-top: 0.55rem;
+/* 获取方式：展示框下方，普通样式、非框 */
+.rune-acquire {
+  margin: 0.5rem 0 0;
+  padding-left: 0.35rem;
   font-size: 0.85rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--muted);
 }
-.rune-src b {
-  display: block;
-  font-size: 0.72rem;
+.rune-acquire b {
   color: var(--accent);
-  margin-bottom: 0.2rem;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-right: 0.35rem;
+  letter-spacing: 0.05em;
 }
-.rune-src span { color: var(--muted); }
 
 footer {
   text-align: center;
