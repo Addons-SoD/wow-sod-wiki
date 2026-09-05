@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>符文指南 · 魔兽世界探索赛季 Wiki</title>
-  <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理各符文效果与获取方式" />
+  <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理全部符文效果与获取方式" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
   <link rel="stylesheet" href="assets/style.css" />
@@ -14,24 +14,29 @@
     <div class="hero-card">
       <a class="hero-back" href="./">← 返回 Wiki 首页</a>
       <h1>探索赛季 · 符文指南</h1>
-      <p>按职业与装备槽位整理各符文的解锁、效果与获取方式</p>
+      <p>全部 271 条符文：效果与获取方式 · 按职业与装备部位分类</p>
     </div>
   </header>
 
   <main>
     <div class="notice">
-      符文（Rune）铭刻于特定装备槽位，为职业带来全新技能与被动。本页按
-      <strong>职业 → 槽位</strong> 组织，数据整理自玩家社区资料，正在逐步填充中。
+      符文（Rune）铭刻于特定装备槽位，为职业带来全新技能与被动。
+      效果文本取自游戏客户端官方简体中文（1.15.9 渲染 tooltip），获取方式由 warcraft.wiki.gg 资料整理翻译。
+      数据随补丁更新，请以游戏内为准。
     </div>
 
-    <div id="class-tabs"></div>
+    <div id="class-tabs" class="ctrl-row"></div>
 
-    <table id="rune-table">
-      <thead>
-        <tr><th>槽位</th><th>符文名称</th><th>效果说明</th><th>获取 / 解锁方式</th><th>阶段</th></tr>
-      </thead>
-      <tbody id="rune-body"></tbody>
-    </table>
+    <div class="toolbar">
+      <input type="search" id="rune-q" placeholder="搜索符文 / 效果 / 获取方式…" autocomplete="off" />
+      <span id="rune-count" class="rune-count"></span>
+    </div>
+
+    <div id="slot-chips" class="ctrl-row"></div>
+
+    <div id="rune-list">
+      <p class="empty-note">数据加载中…</p>
+    </div>
   </main>
 
   <footer>
@@ -41,70 +46,119 @@
   <script src="assets/version.js"></script>
 
   <script>
-    // 数据格式：[槽位, 符文名, 效果说明, 获取方式, 阶段(P1/P2/P3/P4/P5)]
-    const RUNES = {
-      "战士": [],
-      "圣骑士": [],
-      "猎人": [],
-      "潜行者": [],
-      "牧师": [],
-      "萨满祭司": [],
-      "法师": [],
-      "术士": [],
-      "德鲁伊": []
-    };
+    "use strict";
+    var DATA = null;
+    var state = { cls: 0, slot: null, q: "" };
 
-    const CLASS_TABS = ["战士", "圣骑士", "猎人", "潜行者", "牧师", "萨满祭司", "法师", "术士", "德鲁伊"];
-    let current = CLASS_TABS[0];
+    function $(id) { return document.getElementById(id); }
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function fmt(s) { return esc(s).replace(/\n/g, "<br>"); }
+    function qClass(q) { return "q-" + (q || "none"); }
 
     function renderTabs() {
-      const box = document.getElementById("class-tabs");
+      var box = $("class-tabs");
       box.innerHTML = "";
-      CLASS_TABS.forEach(function (cls) {
-        const btn = document.createElement("button");
-        btn.textContent = cls;
-        btn.className = cls === current ? "active" : "";
-        btn.onclick = function () { current = cls; renderTabs(); renderTable(); };
-        box.appendChild(btn);
+      DATA.classes.forEach(function (c, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "tab-btn" + (i === state.cls ? " active" : "");
+        b.innerHTML = esc(c.zh) + " <em>" + c.count + "</em>";
+        b.onclick = function () {
+          state.cls = i; state.slot = null; state.q = "";
+          $("rune-q").value = "";
+          renderTabs(); renderSlots(); renderList();
+        };
+        box.appendChild(b);
       });
     }
 
-    function renderTable() {
-      const body = document.getElementById("rune-body");
-      const rows = RUNES[current] || [];
-      body.innerHTML = "";
-      if (!rows.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 5;
-        td.className = "empty";
-        td.textContent = "「" + current + "」的符文数据整理中，敬请期待。";
-        tr.appendChild(td);
-        body.appendChild(tr);
+    function renderSlots() {
+      var box = $("slot-chips");
+      var cls = DATA.classes[state.cls];
+      box.innerHTML = "";
+      var all = document.createElement("button");
+      all.type = "button";
+      all.className = "chip" + (state.slot === null ? " active" : "");
+      all.textContent = "全部部位";
+      all.onclick = function () { state.slot = null; renderSlots(); renderList(); };
+      box.appendChild(all);
+      cls.slots.forEach(function (s) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip" + (state.slot === s.slot ? " active" : "");
+        b.innerHTML = esc(s.zh) + " <em>" + s.runes.length + "</em>";
+        b.onclick = function () { state.slot = s.slot; renderSlots(); renderList(); };
+        box.appendChild(b);
+      });
+    }
+
+    function matches(r, q) {
+      if (!q) return true;
+      var hay = [r.name_zh, r.name_en, r.item_zh, r.desc_zh, r.source_zh].join(" ").toLowerCase();
+      return q.toLowerCase().split(/\s+/).every(function (t) { return hay.indexOf(t) >= 0; });
+    }
+
+    function renderList() {
+      var box = $("rune-list");
+      var cls = DATA.classes[state.cls];
+      var q = state.q.trim();
+      var groups = [];
+      var shownTotal = 0;
+      var availTotal = 0;
+      cls.slots.forEach(function (s) {
+        if (state.slot && s.slot !== state.slot) return;
+        availTotal += s.runes.length;
+        var hits = s.runes.filter(function (r) { return matches(r, q); });
+        if (hits.length) { groups.push({ zh: s.zh, runes: hits }); shownTotal += hits.length; }
+      });
+
+      $("rune-count").textContent = "显示 " + shownTotal + " / " + availTotal + " 条";
+
+      if (!groups.length) {
+        box.innerHTML = '<p class="empty-note">没有匹配的符文。</p>';
         return;
       }
-      rows.forEach(function (r) {
-        const tr = document.createElement("tr");
-        [r[0], r[1], r[2], r[3], r[4]].forEach(function (cell, i) {
-          const td = document.createElement("td");
-          if (i === 1) td.className = "rune-name";
-          if (i === 0) td.className = "slot";
-          if (i === 4) {
-            const span = document.createElement("span");
-            span.className = "phase-tag";
-            span.textContent = cell || "-";
-            td.appendChild(span);
-          } else {
-            td.textContent = cell || "-";
-          }
-          tr.appendChild(td);
+
+      var html = "";
+      groups.forEach(function (g) {
+        html += '<h2 class="slot-h">' + esc(g.zh) + ' <span>' + g.runes.length + " 条</span></h2>";
+        html += '<div class="rune-grid">';
+        g.runes.forEach(function (r) {
+          var badge = (r.item_zh && r.item_zh !== r.name_zh)
+            ? '<span class="rune-item">' + esc(r.item_zh) + "</span>" : "";
+          html += '<article class="rune-card ' + qClass(r.quality) + '">'
+            + '<header class="rune-head">'
+            + "<h3>" + esc(r.name_zh) + "</h3>"
+            + '<div class="rune-sub">'
+            + (r.name_en ? '<span class="rune-en">' + esc(r.name_en) + "</span>" : "")
+            + badge
+            + "</div></header>"
+            + '<p class="rune-desc">' + fmt(r.desc_zh) + "</p>"
+            + (r.source_zh ? '<p class="rune-src"><b>获取方式</b><span>' + fmt(r.source_zh) + "</span></p>" : "")
+            + "</article>";
         });
-        body.appendChild(tr);
+        html += "</div>";
       });
+      box.innerHTML = html;
     }
 
-    renderTabs();
-    renderTable();
+    $("rune-q").addEventListener("input", function () {
+      state.q = this.value;
+      renderList();
+    });
+
+    fetch("assets/rune-data.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        DATA = d;
+        renderTabs(); renderSlots(); renderList();
+      })
+      .catch(function (e) {
+        $("rune-list").innerHTML = '<p class="empty-note">符文数据加载失败：' + esc(e.message) + "。请刷新重试。</p>";
+      });
   </script>
 </body>
 </html>
