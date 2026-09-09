@@ -328,14 +328,18 @@ footer {
   margin-bottom: 0.3rem;
   table-layout: fixed; /* 固定列宽，避免各 Boss 表格列宽不一致导致错位 */
 }
-.loot-table th { font-size: 0.82rem; }
-.loot-table td { padding: 0.45rem 0.9rem; font-size: 0.9rem; vertical-align: middle; }
+.loot-table th { font-size: 0.82rem; padding: 0.5rem 0.9rem; }
+.loot-table td { padding: 0.5rem 0.9rem; font-size: 0.9rem; vertical-align: middle; height: 2.5rem; }
 .loot-name {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
   font-weight: 600;
   line-height: 1.4;
+}
+/* flex 容器必须放在 td 内部：直接给 td 设 display:flex 会破坏表格单元格布局 */
+.loot-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
 }
 .loot-name.q0 { color: #9d9d9d; }
 .loot-name.q1 { color: #ffffff; }

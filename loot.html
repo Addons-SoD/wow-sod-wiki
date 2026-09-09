@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.14" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.15" />
 </head>
 <body>
   <header class="hero">
@@ -156,7 +156,7 @@
       if (!it) return "";
       var q = qOf(it.q);
       var h = '<tr data-id="' + esc(id) + '"' + (rate == null ? "" : ' data-rate="' + rate + '"') + '>'
-        + '<td class="loot-name q' + q + '">' + iconImg(it, "item-icon") + esc(it.n) + "</td>"
+        + '<td class="loot-name q' + q + '"><span class="loot-inner">' + iconImg(it, "item-icon") + esc(it.n) + "</span></td>"
         + '<td class="loot-ilvl">' + (it.il || "-") + "</td>"
         + '<td class="loot-slot">' + esc(it.sl || "-") + "</td>";
       if (showSource) {
