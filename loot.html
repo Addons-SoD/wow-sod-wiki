@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>掉落查询 · 魔兽世界探索赛季 Wiki</title>
+  <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preload" as="image" href="assets/bg.jpeg" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-card">
+      <a class="hero-back" href="./">← 返回 Wiki 首页</a>
+      <h1>探索赛季 · 掉落查询</h1>
+      <p>副本 / 团队 / 专业 / 声望 / PvP / 活动掉落一览</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="notice">
+      物品名称与属性取自游戏客户端，掉落来源与掉率来自 <strong>AtlasLoot</strong> 插件数据。
+      选择分类与副本查看 Boss 掉落，或直接搜索物品名称。掉率仅供参考，请以游戏内为准。
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="loot-q" placeholder="搜索物品名称…" autocomplete="off" />
+      <span id="loot-count" class="rune-count"></span>
+    </div>
+
+    <div id="loot-tabs" class="ctrl-row"></div>
+
+    <div id="loot-picker" class="ctrl-row">
+      <select id="loot-content" aria-label="选择副本或分类"></select>
+    </div>
+
+    <div id="loot-body">
+      <p class="empty-note">数据加载中…</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>本 Wiki 为玩家社区项目，与暴雪娱乐（Blizzard Entertainment）无隶属关系。<span class="site-version" data-version>v…</span></p>
+  </footer>
+
+  <script src="assets/version.js"></script>
+
+  <script>
+    "use strict";
+    var DATA = null;
+    var SOURCES = null;   /* itemID -> [[模块, 内容, Boss], ...] */
+    var state = { mod: 0, content: null, q: "" };
+
+    function $(id) { return document.getElementById(id); }
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function qCls(q) { return "q" + (q == null ? 0 : q); }
+
+    /* 建立物品 -> 来源索引 */
+    function buildSources() {
+      var map = {};
+      DATA.modules.forEach(function (m) {
+        m.contents.forEach(function (c) {
+          c.bosses.forEach(function (b) {
+            b.items.forEach(function (row) {
+              var id = String(row[0]);
+              if (!map[id]) map[id] = [];
+              map[id].push([m.zh, c.zh, b.name]);
+            });
+          });
+        });
+      });
+      return map;
+    }
+
+    function itemRow(id, rate) {
+      var it = DATA.items[String(id)];
+      if (!it) return "";
+      var name = it[0], q = it[1], ilvl = it[2], slot = it[3], type = it[4], stats = it[5];
+      var tip = [type, stats].filter(Boolean).join(" | ");
+      return '<tr title="' + esc(tip) + '">'
+        + '<td class="loot-name ' + qCls(q) + '">' + esc(name) + "</td>"
+        + '<td class="loot-ilvl">' + (ilvl || "-") + "</td>"
+        + '<td class="loot-slot">' + esc(slot || "-") + "</td>"
+        + '<td class="loot-type">' + esc(type || "-") + "</td>"
+        + '<td class="loot-rate">' + (rate == null ? "-" : rate + "%") + "</td>"
+        + "</tr>";
+    }
+
+    function renderTabs() {
+      var box = $("loot-tabs");
+      box.innerHTML = "";
+      DATA.modules.forEach(function (m, i) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "tab-btn" + (i === state.mod ? " active" : "");
+        b.textContent = m.zh;
+        b.onclick = function () {
+          state.mod = i;
+          state.content = m.contents.length ? m.contents[0].key : null;
+          state.q = ""; $("loot-q").value = "";
+          renderTabs(); renderPicker(); renderBody();
+        };
+        box.appendChild(b);
+      });
+    }
+
+    function renderPicker() {
+      var sel = $("loot-content");
+      sel.innerHTML = "";
+      var mod = DATA.modules[state.mod];
+      var groups = {};
+      mod.contents.forEach(function (c) {
+        var g = c.type || "其他";
+        (groups[g] = groups[g] || []).push(c);
+      });
+      Object.keys(groups).forEach(function (g) {
+        var og = document.createElement("optgroup");
+        og.label = g;
+        groups[g].forEach(function (c) {
+          var o = document.createElement("option");
+          o.value = c.key;
+          o.textContent = c.zh;
+          if (c.key === state.content) o.selected = true;
+          og.appendChild(o);
+        });
+        sel.appendChild(og);
+      });
+      sel.onchange = function () {
+        state.content = this.value;
+        renderBody();
+      };
+      $("loot-picker").style.display = state.q ? "none" : "";
+    }
+
+    function renderContent() {
+      var mod = DATA.modules[state.mod];
+      var content = mod.contents.filter(function (c) { return c.key === state.content; })[0];
+      if (!content) { $("loot-body").innerHTML = '<p class="empty-note">请选择内容。</p>'; return; }
+      var total = content.bosses.reduce(function (a, b) { return a + b.items.length; }, 0);
+      $("loot-count").textContent = content.zh + " · " + content.bosses.length + " 个节点 · " + total + " 条掉落";
+
+      var html = "";
+      content.bosses.forEach(function (b) {
+        html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + b.items.length + " 件</span></h2>";
+        html += '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>掉率</th></tr></thead><tbody>';
+        b.items.forEach(function (row) { html += itemRow(row[0], row[1]); });
+        html += "</tbody></table>";
+      });
+      $("loot-body").innerHTML = html;
+    }
+
+    function renderSearch() {
+      var q = state.q.toLowerCase();
+      var hits = [];
+      Object.keys(DATA.items).forEach(function (id) {
+        var it = DATA.items[id];
+        if (it[0].toLowerCase().indexOf(q) >= 0) hits.push(id);
+      });
+      $("loot-count").textContent = "匹配 " + hits.length + " 件物品" + (hits.length > 300 ? "（仅显示前 300 条）" : "");
+      if (!hits.length) {
+        $("loot-body").innerHTML = '<p class="empty-note">没有匹配的物品。</p>';
+        return;
+      }
+      var html = '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>来源</th></tr></thead><tbody>';
+      hits.slice(0, 300).forEach(function (id) {
+        var it = DATA.items[id];
+        var src = (SOURCES[id] || []).slice(0, 3).map(function (s) { return s[1] + " · " + s[2]; }).join("；");
+        var extra = (SOURCES[id] || []).length > 3 ? " 等" : "";
+        html += '<tr title="' + esc([it[4], it[5]].filter(Boolean).join(" | ")) + '">'
+          + '<td class="loot-name ' + qCls(it[1]) + '">' + esc(it[0]) + "</td>"
+          + '<td class="loot-ilvl">' + (it[2] || "-") + "</td>"
+          + '<td class="loot-slot">' + esc(it[3] || "-") + "</td>"
+          + '<td class="loot-type">' + esc(it[4] || "-") + "</td>"
+          + '<td class="loot-src">' + esc(src + extra || "-") + "</td>"
+          + "</tr>";
+      });
+      html += "</tbody></table>";
+      $("loot-body").innerHTML = html;
+    }
+
+    function renderBody() {
+      if (state.q) { $("loot-picker").style.display = "none"; renderSearch(); }
+      else { $("loot-picker").style.display = ""; renderContent(); }
+    }
+
+    $("loot-q").addEventListener("input", function () {
+      state.q = this.value.trim();
+      renderBody();
+    });
+
+    fetch("assets/loot-data.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        DATA = d;
+        SOURCES = buildSources();
+        state.content = DATA.modules[0].contents.length ? DATA.modules[0].contents[0].key : null;
+        renderTabs(); renderPicker(); renderBody();
+      })
+      .catch(function (e) {
+        $("loot-body").innerHTML = '<p class="empty-note">掉落数据加载失败：' + esc(e.message) + "。请刷新重试。</p>";
+      });
+  </script>
+</body>
+</html>

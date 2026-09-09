@@ -311,3 +311,29 @@ footer {
     font-size: 0.8rem;
   }
 }
+
+/* ---- 掉落查询页 ---- */
+#loot-content {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  min-width: 240px;
+}
+#loot-content:focus { outline: none; border-color: var(--accent); }
+.loot-table { margin-bottom: 0.3rem; }
+.loot-table th { font-size: 0.82rem; }
+.loot-table td { padding: 0.5rem 0.9rem; font-size: 0.9rem; }
+.loot-name { font-weight: 600; }
+.loot-name.q0 { color: #9d9d9d; }
+.loot-name.q1 { color: #ffffff; }
+.loot-name.q2 { color: #1eff00; }
+.loot-name.q3 { color: #0070dd; }
+.loot-name.q4 { color: #a335ee; }
+.loot-name.q5 { color: #ff8000; }
+.loot-ilvl, .loot-rate { white-space: nowrap; color: var(--muted); }
+.loot-slot { white-space: nowrap; color: var(--muted); }
+.loot-type, .loot-src { color: var(--muted); font-size: 0.85rem; }
