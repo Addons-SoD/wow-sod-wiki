@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.12" />
 </head>
 <body>
   <header class="hero">
@@ -112,24 +112,23 @@
     }
 
     var tipEl = null, tipVisible = false, curX = 0, curY = 0;
-    var TIP_OFFSET = 18;
+    var TIP_OFFSET = 16;
 
     function getTip() {
       if (!tipEl) {
         tipEl = document.createElement("div");
         tipEl.className = "tooltip";
-        tipEl.hidden = true;
         document.body.appendChild(tipEl);
       }
       return tipEl;
     }
     function positionTip() {
       var el = tipEl;
-      if (!el || el.hidden) return;
+      if (!el || !tipVisible) return;
       var r = el.getBoundingClientRect();
       var x = curX + TIP_OFFSET, y = curY + TIP_OFFSET;
-      if (x + r.width > window.innerWidth) x = curX - r.width - TIP_OFFSET;
-      if (y + r.height > window.innerHeight) y = curY - r.height - TIP_OFFSET;
+      if (x + r.width > window.innerWidth - 8) x = curX - r.width - TIP_OFFSET;
+      if (y + r.height > window.innerHeight - 8) y = curY - r.height - TIP_OFFSET;
       if (x < 8) x = 8;
       if (y < 8) y = 8;
       el.style.left = x + "px";
@@ -139,12 +138,14 @@
       var el = getTip();
       curX = e.clientX; curY = e.clientY;
       el.innerHTML = html;
-      el.hidden = false;
+      el.style.display = "block";
+      el.style.left = "0px";
+      el.style.top = "0px";
       tipVisible = true;
       positionTip();
     }
     function hideTip() {
-      if (tipEl) tipEl.hidden = true;
+      if (tipEl) tipEl.style.display = "none";
       tipVisible = false;
     }
 
@@ -266,21 +267,23 @@
       renderBody();
     });
 
+    document.addEventListener("mousemove", function (e) {
+      curX = e.clientX; curY = e.clientY;
+      if (tipVisible) positionTip();
+    });
     $("loot-body").addEventListener("mouseover", function (e) {
       var tr = e.target.closest ? e.target.closest("tr[data-id]") : null;
       if (!tr) return;
       var it = DATA.items[tr.getAttribute("data-id")];
       if (it) showTip(buildTip(it), e);
     });
-    $("loot-body").addEventListener("mousemove", function (e) {
-      if (!tipVisible) return;
-      curX = e.clientX; curY = e.clientY;
-      positionTip();
-    });
     $("loot-body").addEventListener("mouseout", function (e) {
-      var tr = e.target.closest ? e.target.closest("tr[data-id]") : null;
-      if (tr) hideTip();
+      var to = e.relatedTarget;
+      if (to && to.closest && to.closest("tr[data-id]")) return;
+      hideTip();
     });
+    $("loot-body").addEventListener("mouseleave", hideTip);
+    window.addEventListener("scroll", function () { if (tipVisible) hideTip(); }, true);
 
     fetch("assets/loot-data.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
