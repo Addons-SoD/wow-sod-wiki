@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.18" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.19" />
 </head>
 <body>
   <header class="hero">
@@ -173,13 +173,20 @@
 
     function buildSources() {
       var map = {};
+      function add(m, c, bname, rows) {
+        rows.forEach(function (row) {
+          var id = String(row[0]);
+          (map[id] = map[id] || []).push([m.zh, c.zh, bname]);
+        });
+      }
       DATA.modules.forEach(function (m) {
         m.contents.forEach(function (c) {
           c.bosses.forEach(function (b) {
-            b.items.forEach(function (row) {
-              var id = String(row[0]);
-              (map[id] = map[id] || []).push([m.zh, c.zh, b.name]);
-            });
+            if (b.groups) {
+              b.groups.forEach(function (g) { add(m, c, b.name + " · " + g.label, g.items); });
+            } else if (b.items) {
+              add(m, c, b.name, b.items);
+            }
           });
         });
       });
@@ -228,20 +235,38 @@
       sel.onchange = function () { state.content = this.value; renderBody(); };
     }
 
+    var LOOT_HEAD = '<colgroup><col style="width:42%"><col style="width:12%"><col style="width:16%"><col style="width:30%"></colgroup>'
+      + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th></tr></thead><tbody>';
+
+    function bossCount(b) {
+      if (b.groups) return b.groups.reduce(function (a, g) { return a + g.items.length; }, 0);
+      return b.items ? b.items.length : 0;
+    }
+
     function renderContent() {
       var mod = DATA.modules[state.mod];
       var content = mod.contents.filter(function (c) { return c.key === state.content; })[0];
       if (!content) { $("loot-body").innerHTML = '<p class="empty-note">请选择内容。</p>'; return; }
-      var total = content.bosses.reduce(function (a, b) { return a + b.items.length; }, 0);
+      var total = content.bosses.reduce(function (a, b) { return a + bossCount(b); }, 0);
       $("loot-count").textContent = content.zh + " · " + content.bosses.length + " 个节点 · " + total + " 条掉落";
       var html = "";
       content.bosses.forEach(function (b) {
-        html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + b.items.length + " 件</span></h2>";
-        html += '<table class="loot-table">'
-          + '<colgroup><col style="width:42%"><col style="width:12%"><col style="width:16%"><col style="width:30%"></colgroup>'
-          + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th></tr></thead><tbody>';
-        b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
-        html += "</tbody></table>";
+        var cnt = bossCount(b);
+        html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + cnt + " 件</span></h2>";
+        if (b.groups) {
+          // 二级折叠：套装（setID → 每件）/ 专业配方（spellID → 产物）
+          b.groups.forEach(function (g) {
+            html += '<details class="fold-group"><summary>' + esc(g.label)
+              + ' <em>' + g.items.length + ' 件</em></summary>'
+              + '<table class="loot-table">' + LOOT_HEAD;
+            g.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
+            html += "</tbody></table></details>";
+          });
+        } else {
+          html += '<table class="loot-table">' + LOOT_HEAD;
+          b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
+          html += "</tbody></table>";
+        }
       });
       $("loot-body").innerHTML = html;
     }

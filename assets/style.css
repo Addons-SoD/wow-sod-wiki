@@ -351,6 +351,45 @@ footer {
 .loot-slot { white-space: nowrap; color: var(--muted); }
 .loot-type, .loot-src { color: var(--muted); font-size: 0.85rem; }
 
+/* 二级折叠：套装（setID→每件）/ 专业配方（配方→产物） */
+.fold-group {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+.fold-group > summary {
+  cursor: pointer;
+  padding: 0.55rem 0.9rem;
+  font-weight: 600;
+  color: var(--link);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: color 0.15s;
+}
+.fold-group > summary::-webkit-details-marker { display: none; }
+.fold-group > summary::before {
+  content: "▸";
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.fold-group[open] > summary::before { content: "▾"; }
+.fold-group > summary em {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+.fold-group[open] > summary {
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+}
+.fold-group .loot-table { margin: 0; border: none; border-radius: 0; }
+.fold-group:hover > summary { color: var(--accent); }
+
 /* 物品图标（列表内小图标，固定尺寸不撑行） */
 .item-icon {
   width: 24px;
