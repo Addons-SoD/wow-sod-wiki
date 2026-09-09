@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.13" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.14" />
 </head>
 <body>
   <header class="hero">
@@ -83,7 +83,7 @@
     }
 
     /* ---------- 物品 tooltip ---------- */
-    function buildTip(it) {
+    function buildTip(it, rate) {
       var q = qOf(it.q);
       var h = '<div class="ti">' + iconImg(it, "b" + q);
       h += '<div><div class="nm q' + q + '">' + esc(it.n) + '</div>';
@@ -106,6 +106,7 @@
       }
       if (it.du) h += '<div class="row muted">' + esc(it.du) + '</div>';
       if (it.rl) h += '<div class="row req">需要等级 ' + esc(it.rl) + '</div>';
+      if (rate != null && rate !== "") h += '<div class="row muted">掉率：' + esc(rate) + '%</div>';
       if (it.sp) h += '<div class="row req">售价：' + esc(it.sp) + '</div>';
       if (it.ph) h += '<div class="row muted">' + esc(String(it.ph).replace("Phase", "阶段")) + '</div>';
       return h;
@@ -154,7 +155,7 @@
       var it = DATA.items[String(id)];
       if (!it) return "";
       var q = qOf(it.q);
-      var h = '<tr data-id="' + esc(id) + '">'
+      var h = '<tr data-id="' + esc(id) + '"' + (rate == null ? "" : ' data-rate="' + rate + '"') + '>'
         + '<td class="loot-name q' + q + '">' + iconImg(it, "item-icon") + esc(it.n) + "</td>"
         + '<td class="loot-ilvl">' + (it.il || "-") + "</td>"
         + '<td class="loot-slot">' + esc(it.sl || "-") + "</td>";
@@ -163,8 +164,7 @@
         var extra = (SOURCES[id] || []).length > 3 ? " 等" : "";
         h += '<td class="loot-src">' + esc((src + extra) || "-") + "</td>";
       } else {
-        h += '<td class="loot-type">' + esc(it.tp || "-") + "</td>"
-          + '<td class="loot-rate">' + (rate == null ? "-" : rate + "%") + "</td>";
+        h += '<td class="loot-type">' + esc(it.tp || "-") + "</td>";
       }
       return h + "</tr>";
     }
@@ -236,8 +236,8 @@
       content.bosses.forEach(function (b) {
         html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + b.items.length + " 件</span></h2>";
         html += '<table class="loot-table">'
-          + '<colgroup><col style="width:52%"><col style="width:10%"><col style="width:14%"><col style="width:16%"><col style="width:8%"></colgroup>'
-          + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>掉率</th></tr></thead><tbody>';
+          + '<colgroup><col style="width:42%"><col style="width:12%"><col style="width:16%"><col style="width:30%"></colgroup>'
+          + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th></tr></thead><tbody>';
         b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
         html += "</tbody></table>";
       });
@@ -253,7 +253,7 @@
       $("loot-count").textContent = "匹配 " + hits.length + " 件物品" + (hits.length > 300 ? "（仅显示前 300 条）" : "");
       if (!hits.length) { $("loot-body").innerHTML = '<p class="empty-note">没有匹配的物品。</p>'; return; }
       var html = '<table class="loot-table">'
-        + '<colgroup><col style="width:46%"><col style="width:10%"><col style="width:14%"><col style="width:30%"></colgroup>'
+        + '<colgroup><col style="width:42%"><col style="width:12%"><col style="width:16%"><col style="width:30%"></colgroup>'
         + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>来源</th></tr></thead><tbody>';
       hits.slice(0, 300).forEach(function (id) { html += rowHtml(id, null, true); });
       html += "</tbody></table>";
@@ -279,7 +279,7 @@
       var tr = e.target.closest ? e.target.closest("tr[data-id]") : null;
       if (!tr) return;
       var it = DATA.items[tr.getAttribute("data-id")];
-      if (it) showTip(buildTip(it), e);
+      if (it) showTip(buildTip(it, tr.getAttribute("data-rate")), e);
     });
     $("loot-body").addEventListener("mouseout", function (e) {
       var to = e.relatedTarget;
