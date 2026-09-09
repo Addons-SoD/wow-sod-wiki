@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>掉落查询 · 魔兽世界探索赛季 Wiki</title>
-  <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览" />
+  <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
   <link rel="stylesheet" href="assets/style.css" />
@@ -14,14 +14,14 @@
     <div class="hero-card">
       <a class="hero-back" href="./">← 返回 Wiki 首页</a>
       <h1>探索赛季 · 掉落查询</h1>
-      <p>副本 / 团队 / 专业 / 声望 / PvP / 活动掉落一览</p>
+      <p>副本 / 团队 / 专业 / 声望 / PvP / 活动掉落 · 悬停查看物品详情</p>
     </div>
   </header>
 
   <main>
     <div class="notice">
-      物品名称与属性取自游戏客户端，掉落来源与掉率来自 <strong>AtlasLoot</strong> 插件数据。
-      选择分类与副本查看 Boss 掉落，或直接搜索物品名称。掉率仅供参考，请以游戏内为准。
+      物品名称、图标、属性与绿字来自游戏客户端与 wowhead，掉落来源与掉率来自 <strong>AtlasLoot</strong> 插件数据。
+      将鼠标移到物品上可查看完整属性与装备效果；也可直接搜索物品名称。掉率仅供参考，请以游戏内为准。
     </div>
 
     <div class="toolbar">
@@ -48,18 +48,126 @@
 
   <script>
     "use strict";
-    var DATA = null;
-    var SOURCES = null;   /* itemID -> [[模块, 内容, Boss], ...] */
+    var DATA = null, SOURCES = null, ICON_TPL = "", ICON_TPL_NUM = "";
     var state = { mod: 0, content: null, q: "" };
+    var QUAL_ZH = { 0: "粗糙", 1: "普通", 2: "精良", 3: "稀有", 4: "史诗", 5: "传说", 6: "神器" };
+    var CLASS_ZH = {
+      Warrior: "战士", Paladin: "圣骑士", Hunter: "猎人", Rogue: "潜行者", Priest: "牧师",
+      Shaman: "萨满祭司", Mage: "法师", Warlock: "术士", Druid: "德鲁伊"
+    };
 
     function $(id) { return document.getElementById(id); }
     function esc(s) {
       return String(s == null ? "" : s)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
-    function qCls(q) { return "q" + (q == null ? 0 : q); }
+    function qOf(q) { return q == null ? 1 : q; }
+    function iconUrl(it) {
+      if (!it) return "";
+      if (it.ic) return ICON_TPL.replace("%s", it.ic);
+      if (it.icn) return ICON_TPL_NUM.replace("%s", it.icn);
+      return "";
+    }
+    function clsZh(s) {
+      if (!s) return "";
+      return s.split(",").map(function (x) {
+        x = x.trim();
+        return CLASS_ZH[x] || x;
+      }).join(" / ");
+    }
 
-    /* 建立物品 -> 来源索引 */
+    function iconImg(it, cls) {
+      var u = iconUrl(it);
+      if (!u) return '<span class="' + cls + '" style="display:inline-block"></span>';
+      return '<img class="' + cls + ' q' + qOf(it.q) + '" src="' + esc(u) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'" />';
+    }
+
+    /* ---------- 物品 tooltip ---------- */
+    function buildTip(it) {
+      var q = qOf(it.q);
+      var h = '<div class="ti">' + iconImg(it, "b" + q);
+      h += '<div><div class="nm q' + q + '">' + esc(it.n) + '</div>';
+      h += '<div class="qlabel q' + q + '">' + esc(QUAL_ZH[q] || "普通") + '</div></div></div>';
+      if (it.bd) h += '<div class="row muted">' + esc(it.bd) + '</div>';
+      if (it.cl) h += '<div class="row muted">职业：' + esc(clsZh(it.cl)) + '</div>';
+      if (it.il) h += '<div class="row itemLevel">物品等级 ' + esc(it.il) + '</div>';
+      h += '<div class="hr"></div>';
+      var head = [it.sl, it.tp].filter(Boolean).join(" · ");
+      if (head) h += '<div class="row muted">' + esc(head) + '</div>';
+      if (it.wp) h += '<div class="row">' + esc(it.wp) + '</div>';
+      if (it.ar) h += '<div class="row">' + esc(it.ar) + '</div>';
+      if (it.st && it.st.length) {
+        h += '<div class="hr"></div>';
+        it.st.forEach(function (s) { h += '<div class="row stat">' + esc(s) + '</div>'; });
+      }
+      if (it.ef && it.ef.length) {
+        h += '<div class="hr"></div>';
+        it.ef.forEach(function (s) { h += '<div class="row effect">' + esc(s) + '</div>'; });
+      }
+      if (it.du) h += '<div class="row muted">' + esc(it.du) + '</div>';
+      if (it.rl) h += '<div class="row req">需要等级 ' + esc(it.rl) + '</div>';
+      if (it.sp) h += '<div class="row req">售价：' + esc(it.sp) + '</div>';
+      if (it.ph) h += '<div class="row muted">' + esc(String(it.ph).replace("Phase", "阶段")) + '</div>';
+      return h;
+    }
+
+    var tipEl = null, tipVisible = false, curX = 0, curY = 0;
+    var TIP_OFFSET = 18;
+
+    function getTip() {
+      if (!tipEl) {
+        tipEl = document.createElement("div");
+        tipEl.className = "tooltip";
+        tipEl.hidden = true;
+        document.body.appendChild(tipEl);
+      }
+      return tipEl;
+    }
+    function positionTip() {
+      var el = tipEl;
+      if (!el || el.hidden) return;
+      var r = el.getBoundingClientRect();
+      var x = curX + TIP_OFFSET, y = curY + TIP_OFFSET;
+      if (x + r.width > window.innerWidth) x = curX - r.width - TIP_OFFSET;
+      if (y + r.height > window.innerHeight) y = curY - r.height - TIP_OFFSET;
+      if (x < 8) x = 8;
+      if (y < 8) y = 8;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+    }
+    function showTip(html, e) {
+      var el = getTip();
+      curX = e.clientX; curY = e.clientY;
+      el.innerHTML = html;
+      el.hidden = false;
+      tipVisible = true;
+      positionTip();
+    }
+    function hideTip() {
+      if (tipEl) tipEl.hidden = true;
+      tipVisible = false;
+    }
+
+    /* ---------- 列表渲染 ---------- */
+    function rowHtml(id, rate, showSource) {
+      var it = DATA.items[String(id)];
+      if (!it) return "";
+      var q = qOf(it.q);
+      var h = '<tr data-id="' + esc(id) + '">'
+        + '<td class="loot-name q' + q + '">' + iconImg(it, "item-icon") + esc(it.n) + "</td>"
+        + '<td class="loot-ilvl">' + (it.il || "-") + "</td>"
+        + '<td class="loot-slot">' + esc(it.sl || "-") + "</td>";
+      if (showSource) {
+        var src = (SOURCES[id] || []).slice(0, 3).map(function (s) { return s[1] + " · " + s[2]; }).join("；");
+        var extra = (SOURCES[id] || []).length > 3 ? " 等" : "";
+        h += '<td class="loot-src">' + esc((src + extra) || "-") + "</td>";
+      } else {
+        h += '<td class="loot-type">' + esc(it.tp || "-") + "</td>"
+          + '<td class="loot-rate">' + (rate == null ? "-" : rate + "%") + "</td>";
+      }
+      return h + "</tr>";
+    }
+
     function buildSources() {
       var map = {};
       DATA.modules.forEach(function (m) {
@@ -67,27 +175,12 @@
           c.bosses.forEach(function (b) {
             b.items.forEach(function (row) {
               var id = String(row[0]);
-              if (!map[id]) map[id] = [];
-              map[id].push([m.zh, c.zh, b.name]);
+              (map[id] = map[id] || []).push([m.zh, c.zh, b.name]);
             });
           });
         });
       });
       return map;
-    }
-
-    function itemRow(id, rate) {
-      var it = DATA.items[String(id)];
-      if (!it) return "";
-      var name = it[0], q = it[1], ilvl = it[2], slot = it[3], type = it[4], stats = it[5];
-      var tip = [type, stats].filter(Boolean).join(" | ");
-      return '<tr title="' + esc(tip) + '">'
-        + '<td class="loot-name ' + qCls(q) + '">' + esc(name) + "</td>"
-        + '<td class="loot-ilvl">' + (ilvl || "-") + "</td>"
-        + '<td class="loot-slot">' + esc(slot || "-") + "</td>"
-        + '<td class="loot-type">' + esc(type || "-") + "</td>"
-        + '<td class="loot-rate">' + (rate == null ? "-" : rate + "%") + "</td>"
-        + "</tr>";
     }
 
     function renderTabs() {
@@ -129,11 +222,7 @@
         });
         sel.appendChild(og);
       });
-      sel.onchange = function () {
-        state.content = this.value;
-        renderBody();
-      };
-      $("loot-picker").style.display = state.q ? "none" : "";
+      sel.onchange = function () { state.content = this.value; renderBody(); };
     }
 
     function renderContent() {
@@ -142,12 +231,11 @@
       if (!content) { $("loot-body").innerHTML = '<p class="empty-note">请选择内容。</p>'; return; }
       var total = content.bosses.reduce(function (a, b) { return a + b.items.length; }, 0);
       $("loot-count").textContent = content.zh + " · " + content.bosses.length + " 个节点 · " + total + " 条掉落";
-
       var html = "";
       content.bosses.forEach(function (b) {
         html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + b.items.length + " 件</span></h2>";
         html += '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>掉率</th></tr></thead><tbody>';
-        b.items.forEach(function (row) { html += itemRow(row[0], row[1]); });
+        b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
         html += "</tbody></table>";
       });
       $("loot-body").innerHTML = html;
@@ -157,27 +245,12 @@
       var q = state.q.toLowerCase();
       var hits = [];
       Object.keys(DATA.items).forEach(function (id) {
-        var it = DATA.items[id];
-        if (it[0].toLowerCase().indexOf(q) >= 0) hits.push(id);
+        if (DATA.items[id].n.toLowerCase().indexOf(q) >= 0) hits.push(id);
       });
       $("loot-count").textContent = "匹配 " + hits.length + " 件物品" + (hits.length > 300 ? "（仅显示前 300 条）" : "");
-      if (!hits.length) {
-        $("loot-body").innerHTML = '<p class="empty-note">没有匹配的物品。</p>';
-        return;
-      }
-      var html = '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>来源</th></tr></thead><tbody>';
-      hits.slice(0, 300).forEach(function (id) {
-        var it = DATA.items[id];
-        var src = (SOURCES[id] || []).slice(0, 3).map(function (s) { return s[1] + " · " + s[2]; }).join("；");
-        var extra = (SOURCES[id] || []).length > 3 ? " 等" : "";
-        html += '<tr title="' + esc([it[4], it[5]].filter(Boolean).join(" | ")) + '">'
-          + '<td class="loot-name ' + qCls(it[1]) + '">' + esc(it[0]) + "</td>"
-          + '<td class="loot-ilvl">' + (it[2] || "-") + "</td>"
-          + '<td class="loot-slot">' + esc(it[3] || "-") + "</td>"
-          + '<td class="loot-type">' + esc(it[4] || "-") + "</td>"
-          + '<td class="loot-src">' + esc(src + extra || "-") + "</td>"
-          + "</tr>";
-      });
+      if (!hits.length) { $("loot-body").innerHTML = '<p class="empty-note">没有匹配的物品。</p>'; return; }
+      var html = '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>来源</th></tr></thead><tbody>';
+      hits.slice(0, 300).forEach(function (id) { html += rowHtml(id, null, true); });
       html += "</tbody></table>";
       $("loot-body").innerHTML = html;
     }
@@ -187,15 +260,34 @@
       else { $("loot-picker").style.display = ""; renderContent(); }
     }
 
+    /* ---------- 事件 ---------- */
     $("loot-q").addEventListener("input", function () {
       state.q = this.value.trim();
       renderBody();
+    });
+
+    $("loot-body").addEventListener("mouseover", function (e) {
+      var tr = e.target.closest ? e.target.closest("tr[data-id]") : null;
+      if (!tr) return;
+      var it = DATA.items[tr.getAttribute("data-id")];
+      if (it) showTip(buildTip(it), e);
+    });
+    $("loot-body").addEventListener("mousemove", function (e) {
+      if (!tipVisible) return;
+      curX = e.clientX; curY = e.clientY;
+      positionTip();
+    });
+    $("loot-body").addEventListener("mouseout", function (e) {
+      var tr = e.target.closest ? e.target.closest("tr[data-id]") : null;
+      if (tr) hideTip();
     });
 
     fetch("assets/loot-data.json", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (d) {
         DATA = d;
+        ICON_TPL = (d.meta && d.meta.icon_cdn) || "https://render.worldofwarcraft.com/classic1x-us/icons/56/%s.jpg";
+        ICON_TPL_NUM = (d.meta && d.meta.icon_cdn_num) || "https://render.worldofwarcraft.com/icons/56/%s.jpg";
         SOURCES = buildSources();
         state.content = DATA.modules[0].contents.length ? DATA.modules[0].contents[0].key : null;
         renderTabs(); renderPicker(); renderBody();

@@ -331,9 +331,65 @@ footer {
 .loot-name.q0 { color: #9d9d9d; }
 .loot-name.q1 { color: #ffffff; }
 .loot-name.q2 { color: #1eff00; }
-.loot-name.q3 { color: #0070dd; }
-.loot-name.q4 { color: #a335ee; }
+.loot-name.q3 { color: #0081ff; }
+.loot-name.q4 { color: #c600ff; }
 .loot-name.q5 { color: #ff8000; }
 .loot-ilvl, .loot-rate { white-space: nowrap; color: var(--muted); }
 .loot-slot { white-space: nowrap; color: var(--muted); }
 .loot-type, .loot-src { color: var(--muted); font-size: 0.85rem; }
+
+/* 物品图标（列表内小图标） */
+.item-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: 1px solid #454b57;
+  vertical-align: -4px;
+  margin-right: 0.4rem;
+  background: #0b0d12;
+}
+.item-icon.q0 { border-color: #9d9d9d; }
+.item-icon.q1 { border-color: #ffffff; }
+.item-icon.q2 { border-color: #1eff00; }
+.item-icon.q3 { border-color: #0081ff; }
+.item-icon.q4 { border-color: #c600ff; }
+.item-icon.q5 { border-color: #ff8000; }
+
+/* 英雄榜风格物品 tooltip（跟随鼠标） */
+.tooltip {
+  position: fixed;
+  z-index: 2000;
+  min-width: 240px;
+  max-width: 340px;
+  background: rgba(0, 0, 0, 0.94);
+  border: 1px solid #3a3f4a;
+  border-radius: 3px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.65);
+  padding: 0.75rem 0.85rem;
+  color: #ffffff;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.tooltip .ti { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; }
+.tooltip .ti img { width: 52px; height: 52px; border-radius: 3px; border: 2px solid; flex: 0 0 auto; }
+.tooltip .nm { font-size: 0.96rem; font-weight: 700; line-height: 1.25; }
+.tooltip .qlabel { font-size: 0.75rem; margin-top: 2px; }
+.tooltip .row { margin: 1px 0; }
+.tooltip .hr { height: 1px; background: #2c303a; margin: 0.45rem 0; }
+.tooltip .stat { color: #0f0; white-space: pre-wrap; }
+.tooltip .effect { color: #66bbff; white-space: pre-wrap; }
+.tooltip .itemLevel, .tooltip .req { color: #ffd100; }
+.tooltip .muted { color: #9d9d9d; }
+.tooltip .q0 { color: #9d9d9d; }
+.tooltip .q1 { color: #ffffff; }
+.tooltip .q2 { color: #1eff00; }
+.tooltip .q3 { color: #0081ff; }
+.tooltip .q4 { color: #c600ff; }
+.tooltip .q5 { color: #ff8000; }
+.tooltip .b0 { border-color: #9d9d9d; }
+.tooltip .b1 { border-color: #ffffff; }
+.tooltip .b2 { border-color: #1eff00; }
+.tooltip .b3 { border-color: #0081ff; }
+.tooltip .b4 { border-color: #c600ff; }
+.tooltip .b5 { border-color: #ff8000; }
