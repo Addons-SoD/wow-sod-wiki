@@ -324,9 +324,12 @@ footer {
   min-width: 240px;
 }
 #loot-content:focus { outline: none; border-color: var(--accent); }
-.loot-table { margin-bottom: 0.3rem; }
+.loot-table {
+  margin-bottom: 0.3rem;
+  table-layout: fixed; /* 固定列宽，避免各 Boss 表格列宽不一致导致错位 */
+}
 .loot-table th { font-size: 0.82rem; }
-.loot-table td { padding: 0.5rem 0.9rem; font-size: 0.9rem; }
+.loot-table td { padding: 0.45rem 0.9rem; font-size: 0.9rem; vertical-align: middle; }
 .loot-name {
   display: flex;
   align-items: center;
@@ -346,10 +349,10 @@ footer {
 
 /* 物品图标（列表内小图标，固定尺寸不撑行） */
 .item-icon {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
-  border-radius: 2px;
+  border-radius: 3px;
   border: 1px solid #454b57;
   background: #0b0d12;
   display: block;

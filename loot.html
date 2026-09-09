@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.12" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.13" />
 </head>
 <body>
   <header class="hero">
@@ -235,7 +235,9 @@
       var html = "";
       content.bosses.forEach(function (b) {
         html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + b.items.length + " 件</span></h2>";
-        html += '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>掉率</th></tr></thead><tbody>';
+        html += '<table class="loot-table">'
+          + '<colgroup><col style="width:52%"><col style="width:10%"><col style="width:14%"><col style="width:16%"><col style="width:8%"></colgroup>'
+          + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th><th>掉率</th></tr></thead><tbody>';
         b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
         html += "</tbody></table>";
       });
@@ -250,7 +252,9 @@
       });
       $("loot-count").textContent = "匹配 " + hits.length + " 件物品" + (hits.length > 300 ? "（仅显示前 300 条）" : "");
       if (!hits.length) { $("loot-body").innerHTML = '<p class="empty-note">没有匹配的物品。</p>'; return; }
-      var html = '<table class="loot-table"><thead><tr><th>物品</th><th>等级</th><th>部位</th><th>来源</th></tr></thead><tbody>';
+      var html = '<table class="loot-table">'
+        + '<colgroup><col style="width:46%"><col style="width:10%"><col style="width:14%"><col style="width:30%"></colgroup>'
+        + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>来源</th></tr></thead><tbody>';
       hits.slice(0, 300).forEach(function (id) { html += rowHtml(id, null, true); });
       html += "</tbody></table>";
       $("loot-body").innerHTML = html;
