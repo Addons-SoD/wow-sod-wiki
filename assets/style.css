@@ -390,6 +390,56 @@ footer {
 .fold-group .loot-table { margin: 0; border: none; border-radius: 0; }
 .fold-group:hover > summary { color: var(--accent); }
 
+/* 二级菜单：点击物品前的箭头向下展开的下级内容（分层展示） */
+.sub-toggle {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0.1rem 0.15rem;
+  margin-right: 0.05rem;
+  flex: 0 0 auto;
+  transition: color 0.15s;
+}
+.sub-toggle:hover { color: var(--accent); }
+.sub-row > td {
+  background: rgba(0, 0, 0, 0.24);
+  padding: 0.55rem 0.9rem 0.7rem 1.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.sub-panel {
+  border-left: 2px solid rgba(200, 162, 75, 0.35);
+  padding-left: 0.7rem;
+}
+.sub-hint {
+  color: var(--muted);
+  font-size: 0.76rem;
+  margin-bottom: 0.45rem;
+  letter-spacing: 0.02em;
+}
+.sub-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.05rem;
+}
+.sub-item-wrap { display: flex; flex-direction: column; }
+.sub-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  font-size: 0.84rem;
+}
+.sub-item .item-icon { width: 18px; height: 18px; }
+.sub-name { white-space: nowrap; }
+.sub-nest {
+  margin: 0.3rem 0 0.1rem 1.1rem;
+  border-left: 2px solid rgba(200, 162, 75, 0.25);
+  padding-left: 0.6rem;
+}
+.sub-nest .sub-grid { gap: 0.25rem 0.9rem; }
+
 /* 物品图标（列表内小图标，固定尺寸不撑行） */
 .item-icon {
   width: 24px;
