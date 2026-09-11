@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.25" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.26" />
 </head>
 <body>
   <header class="hero">
@@ -112,6 +112,12 @@
       if (it.ef && it.ef.length) {
         h += '<div class="hr"></div>';
         it.ef.forEach(function (s) { h += '<div class="row effect">' + esc(s) + '</div>'; });
+      }
+      if (it.sn || (it.se && it.se.length)) {
+        // 套装：名称 + 各件数档位的组合效果（英雄榜用粉紫色）
+        h += '<div class="hr"></div>';
+        if (it.sn) h += '<div class="row spec">' + esc(it.sn) + '</div>';
+        if (it.se) it.se.forEach(function (s) { h += '<div class="row spec">' + esc(s) + '</div>'; });
       }
       if (it.du) h += '<div class="row muted">' + esc(it.du) + '</div>';
       if (it.mk && it.mk.length) h += '<div class="row itemLevel">' + esc(it.mk.join(" · ")) + '</div>';
