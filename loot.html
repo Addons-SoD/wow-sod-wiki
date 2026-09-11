@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.23" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.24" />
 </head>
 <body>
   <header class="hero">
@@ -193,7 +193,8 @@
           c.bosses.forEach(function (b) {
             if (b.groups) {
               b.groups.forEach(function (g) { add(m, c, b.name + " · " + g.label, g.items); });
-            } else if (b.items) {
+            }
+            if (b.items) {
               add(m, c, b.name, b.items);
             }
           });
@@ -248,8 +249,10 @@
       + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>类型</th></tr></thead><tbody>';
 
     function bossCount(b) {
-      if (b.groups) return b.groups.reduce(function (a, g) { return a + g.items.length; }, 0);
-      return b.items ? b.items.length : 0;
+      var n = 0;
+      if (b.groups) n += b.groups.reduce(function (a, g) { return a + g.items.length; }, 0);
+      if (b.items) n += b.items.length;
+      return n;
     }
 
     function renderContent() {
@@ -262,8 +265,8 @@
       content.bosses.forEach(function (b) {
         var cnt = bossCount(b);
         html += '<h2 class="slot-h">' + esc(b.name) + ' <span>' + cnt + " 件</span></h2>";
-        if (b.groups) {
-          // 二级折叠：套装（setID → 每件）/ 专业配方（spellID → 产物）
+        if (b.groups && b.groups.length) {
+          // 二级折叠：套装（setID → 每件）
           b.groups.forEach(function (g) {
             html += '<details class="fold-group"><summary>' + esc(g.label)
               + ' <em>' + g.items.length + ' 件</em></summary>'
@@ -271,7 +274,9 @@
             g.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
             html += "</tbody></table></details>";
           });
-        } else {
+        }
+        if (b.items && b.items.length) {
+          // 无需折叠的物品直接平铺（专业产物、单件套装等）
           html += '<table class="loot-table">' + LOOT_HEAD;
           b.items.forEach(function (row) { html += rowHtml(row[0], row[1], false); });
           html += "</tbody></table>";
