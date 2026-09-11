@@ -435,6 +435,7 @@ footer {
 .tooltip .stat { color: #0f0; white-space: pre-wrap; }
 .tooltip .effect { color: #66bbff; white-space: pre-wrap; }
 .tooltip .itemLevel, .tooltip .req { color: #ffd100; }
+.tooltip .flavor { color: #ffd100; font-style: italic; }
 .tooltip .muted { color: #9d9d9d; }
 .tooltip .q0 { color: #9d9d9d; }
 .tooltip .q1 { color: #ffffff; }

@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.21" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.22" />
 </head>
 <body>
   <header class="hero">
@@ -107,10 +107,12 @@
         it.ef.forEach(function (s) { h += '<div class="row effect">' + esc(s) + '</div>'; });
       }
       if (it.du) h += '<div class="row muted">' + esc(it.du) + '</div>';
+      if (it.mk && it.mk.length) h += '<div class="row itemLevel">' + esc(it.mk.join(" · ")) + '</div>';
       if (it.rl) h += '<div class="row req">需要等级 ' + esc(it.rl) + '</div>';
       if (rate != null && rate !== "") h += '<div class="row muted">掉率：' + esc(rate) + '%</div>';
       if (it.sp) h += '<div class="row req">售价：' + esc(it.sp) + '</div>';
       if (it.ph) h += '<div class="row muted">' + esc(String(it.ph).replace("Phase", "阶段")) + '</div>';
+      if (it.ds) h += '<div class="hr"></div><div class="row flavor">“' + esc(it.ds) + '”</div>';
       return h;
     }
 
