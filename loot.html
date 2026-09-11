@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.22" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.23" />
 </head>
 <body>
   <header class="hero">
@@ -96,7 +96,14 @@
       h += '<div class="hr"></div>';
       var head = [it.sl, it.tp].filter(Boolean).join(" · ");
       if (head) h += '<div class="row muted">' + esc(head) + '</div>';
-      if (it.wp) h += '<div class="row">' + esc(it.wp) + '</div>';
+      if (it.wp) {
+        // 伤害 / 速度 / 每秒伤害 分三行展示
+        it.wp.split(" / ").forEach(function (seg) {
+          if (!seg) return;
+          var cls = seg.indexOf("每秒伤害") >= 0 ? "row muted" : "row";
+          h += '<div class="' + cls + '">' + esc(seg) + '</div>';
+        });
+      }
       if (it.ar) h += '<div class="row">' + esc(it.ar) + '</div>';
       if (it.st && it.st.length) {
         h += '<div class="hr"></div>';
