@@ -390,20 +390,31 @@ footer {
 .fold-group .loot-table { margin: 0; border: none; border-radius: 0; }
 .fold-group:hover > summary { color: var(--accent); }
 
-/* 二级菜单：点击物品前的箭头向下展开的下级内容（分层展示） */
+/* 二级菜单：物品前的折叠箭头（CSS 三角，浅色，展开时旋转 90°） */
 .sub-toggle {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
   background: none;
   border: none;
-  color: var(--muted);
+  padding: 0;
+  margin-right: 0.15rem;
   cursor: pointer;
-  font-size: 0.7rem;
-  line-height: 1;
-  padding: 0.1rem 0.15rem;
-  margin-right: 0.05rem;
-  flex: 0 0 auto;
-  transition: color 0.15s;
 }
-.sub-toggle:hover { color: var(--accent); }
+.sub-toggle::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 8px solid #cfd8e6; /* 浅色，与深色背景区分 */
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  transition: transform 0.15s, border-left-color 0.15s;
+}
+.sub-toggle:hover::before { border-left-color: var(--accent); }
+.sub-toggle[data-open="1"]::before { transform: translateY(-50%) rotate(90deg); }
 .sub-row > td {
   background: rgba(0, 0, 0, 0.24);
   padding: 0.55rem 0.9rem 0.7rem 1.9rem;

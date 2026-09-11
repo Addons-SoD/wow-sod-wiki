@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.2.27" />
+  <link rel="stylesheet" href="assets/style.css?v=0.2.28" />
 </head>
 <body>
   <header class="hero">
@@ -173,7 +173,7 @@
       if (!it) return "";
       var q = qOf(it.q);
       var arrow = it.sub
-        ? '<button type="button" class="sub-toggle" data-sub="1" aria-label="展开下级内容">▸</button>'
+        ? '<button type="button" class="sub-toggle" aria-label="展开下级内容"></button>'
         : "";
       var h = '<tr class="loot-row" data-id="' + esc(id) + '"' + (rate == null ? "" : ' data-rate="' + rate + '"') + '>'
         + '<td class="loot-name q' + q + '"><span class="loot-inner">' + arrow + iconImg(it, "item-icon") + esc(it.n) + "</span></td>"
@@ -190,7 +190,12 @@
     }
 
     /* ---------- 二级菜单（点击展开的下级内容，可递归嵌套） ---------- */
-    function buildSubPanel(itemId) {
+    /* ---------- 二级菜单（点击展开的下级内容，可递归嵌套、带循环防护） ---------- */
+    var SUB_MAX_DEPTH = 2; // 最多嵌套 2 层
+
+    function buildSubPanel(itemId, chain, depth) {
+      chain = chain || [String(itemId)];
+      depth = depth || 0;
       var it = DATA.items[String(itemId)];
       var sub = it && it.sub;
       var panel = document.createElement("div");
@@ -205,18 +210,20 @@
       var grid = document.createElement("div");
       grid.className = "sub-grid";
       sub.i.forEach(function (pair) {
-        var child = DATA.items[String(pair[0])];
+        var cid = String(pair[0]);
+        var child = DATA.items[cid];
         if (!child) return;
         var wrap = document.createElement("div");
         wrap.className = "sub-item-wrap";
         var line = document.createElement("span");
         line.className = "sub-item";
-        line.setAttribute("data-id", String(pair[0]));
-        if (child.sub) {
+        line.setAttribute("data-id", cid);
+        // 已在本展开链上的（含自指）不再给箭头，避免 A↔B 互指无限递归
+        var canNest = child.sub && depth < SUB_MAX_DEPTH && chain.indexOf(cid) < 0;
+        if (canNest) {
           var btn = document.createElement("button");
           btn.type = "button";
           btn.className = "sub-toggle";
-          btn.textContent = "▸";
           btn.setAttribute("aria-label", "展开下级内容");
           btn.addEventListener("click", function (ev) {
             ev.stopPropagation();
@@ -224,13 +231,13 @@
             if (!host) {
               host = document.createElement("div");
               host.className = "sub-nest";
-              host.appendChild(buildSubPanel(pair[0]));
+              host.appendChild(buildSubPanel(cid, chain.concat([cid]), depth + 1));
               wrap.appendChild(host);
-              btn.textContent = "▾";
+              btn.dataset.open = "1";
             } else {
               var show = host.style.display === "none";
               host.style.display = show ? "" : "none";
-              btn.textContent = show ? "▾" : "▸";
+              btn.dataset.open = show ? "1" : "0";
             }
           });
           line.appendChild(btn);
@@ -409,17 +416,17 @@
       if (next && next.classList.contains("sub-row")) {
         var hidden = next.style.display === "none";
         next.style.display = hidden ? "" : "none";
-        btn.textContent = hidden ? "▾" : "▸";
+        btn.dataset.open = hidden ? "1" : "0";
         return;
       }
       var row = document.createElement("tr");
       row.className = "sub-row";
       var td = document.createElement("td");
       td.colSpan = 4;
-      td.appendChild(buildSubPanel(id));
+      td.appendChild(buildSubPanel(id, [String(id)], 0));
       row.appendChild(td);
       tr.parentNode.insertBefore(row, tr.nextSibling);
-      btn.textContent = "▾";
+      btn.dataset.open = "1";
     });
     $("loot-body").addEventListener("mouseleave", hideTip);
     window.addEventListener("scroll", function () { if (tipVisible) hideTip(); }, true);
