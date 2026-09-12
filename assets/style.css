@@ -201,18 +201,46 @@ tr:last-child td { border-bottom: none; }
   margin: 0 0 0.9rem;
   flex-wrap: wrap;
 }
-#rune-q {
+/* 搜索框（掉落查询 / 符文指南共用）：深色面板 + 古铜描边 + 内嵌放大镜 */
+.toolbar input[type="search"] {
   flex: 1 1 260px;
-  max-width: 420px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  padding: 0.45rem 0.85rem;
-  font-size: 0.95rem;
+  max-width: 440px;
+  padding: 0.58rem 2.2rem 0.58rem 2.35rem;
   font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background-color: rgba(15, 17, 21, 0.72);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8a24b' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M15.6 15.6L21 21'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.72rem center;
+  background-size: 1.05rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  -webkit-appearance: none;
+  appearance: none;
 }
-#rune-q:focus { outline: none; border-color: var(--accent); }
+.toolbar input[type="search"]:hover { border-color: rgba(200, 162, 75, 0.5); }
+.toolbar input[type="search"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  background-color: rgba(15, 17, 21, 0.9);
+  box-shadow: 0 0 0 3px rgba(200, 162, 75, 0.14), inset 0 0 14px rgba(200, 162, 75, 0.07);
+}
+.toolbar input[type="search"]::placeholder { color: var(--muted); opacity: 0.9; }
+/* 自定义清除按钮：替换 Chrome/Safari 默认那个素白小叉 */
+.toolbar input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b93a3' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / contain no-repeat;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.toolbar input[type="search"]::-webkit-search-cancel-button:hover { opacity: 1; }
 .rune-count { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
 .empty-note {
   text-align: center;
