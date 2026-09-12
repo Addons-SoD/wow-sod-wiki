@@ -1,78 +1,564 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>装备兑换表 · 魔兽世界探索赛季 Wiki</title>
-  <meta name="description" content="探索赛季（SoD）装备兑换速查：团队副本、PVP、声望与世界事件兑换" />
+  <meta name="description" content="探索赛季（SoD）套装兑换材料计算器：按副本 → 职业 → 套装选择装备，加入购物车并汇总兑换所需材料" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.3.0" />
+  <link rel="stylesheet" href="assets/style.css?v=0.3.1" />
 </head>
 <body>
   <header class="hero">
     <div class="hero-card">
       <a class="hero-back" href="./">← 返回 Wiki 首页</a>
       <h1>探索赛季 · 装备兑换表</h1>
-      <p>团队副本、PVP 与活动货币兑换装备速查</p>
+      <p>套装兑换材料计算器 · 副本 → 职业 → 套装 → 单件装备</p>
     </div>
   </header>
 
   <main>
     <div class="notice">
-      探索赛季中相当一部分装备通过兑换获取：收集副本掉落、活动货币、荣誉等，
-      在对应商人处换取指定装备。本页按兑换来源分类整理，数据逐步填充中，以游戏内为准。
+      本页用于计算套装装备兑换所需材料：先选择副本，按职业与套装浏览装备，点击 <strong>＋ 加入</strong> 把装备丢进右下角的购物车；
+      点击装备前的 <strong>▸ 箭头</strong> 可展开该装备的兑换材料；点击右下角 <strong>购物车</strong> 查看已选装备与材料汇总（同种材料自动合并计数）。
+      <br>
+      <strong>注意：兑换材料目前为占位数据</strong>（每件装备统一按「1 × 坚固的石头」计），真实兑换数据接入后会自动替换；
+      购物车是纯前端状态，<strong>刷新页面即清空</strong>，仅作兑换计算辅助。装备展示与悬停详情复用掉落查询页的数据与样式。
     </div>
 
-    <h2>团队副本兑换</h2>
-    <p>通过团队副本首领掉落的兑换物 / 代币，在主城或营地商人处兑换对应装备。（建设中）</p>
-    <table>
-      <thead>
-        <tr><th>兑换物</th><th>可兑换装备</th><th>需求数量</th><th>来源</th><th>阶段</th></tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="5" class="empty">（待填充）</td></tr>
-      </tbody>
-    </table>
+    <div class="toolbar">
+      <label class="xc-pick-label" for="xc-dungeon">副本</label>
+      <select id="xc-dungeon" aria-label="选择副本"></select>
+      <span id="xc-count" class="rune-count"></span>
+    </div>
 
-    <h2>PVP 兑换</h2>
-    <p>通过荣誉与 PVP 活动（如血月 PVP 大乱斗）获得的货币，兑换 PVP 装备与消耗品。（建设中）</p>
-    <table>
-      <thead>
-        <tr><th>兑换物</th><th>可兑换装备</th><th>需求数量</th><th>来源</th><th>阶段</th></tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="5" class="empty">（待填充）</td></tr>
-      </tbody>
-    </table>
-
-    <h2>声望兑换</h2>
-    <p>各阵营 / 势力声望达到指定等级后，向军需官购买装备。（建设中）</p>
-    <table>
-      <thead>
-        <tr><th>势力</th><th>声望等级</th><th>可兑换装备</th><th>阶段</th></tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="4" class="empty">（待填充）</td></tr>
-      </tbody>
-    </table>
-
-    <h2>世界事件兑换</h2>
-    <p>梦魇入侵、节日与世界活动产出的货币与兑换商人。（建设中）</p>
-    <table>
-      <thead>
-        <tr><th>事件</th><th>兑换物</th><th>可兑换装备 / 物品</th><th>阶段</th></tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="4" class="empty">（待填充）</td></tr>
-      </tbody>
-    </table>
+    <div id="xc-body">
+      <p class="empty-note">数据加载中…</p>
+    </div>
   </main>
 
   <footer>
     <p>本 Wiki 为玩家社区项目，与暴雪娱乐（Blizzard Entertainment）无隶属关系。<span class="site-version" data-version>v…</span></p>
   </footer>
 
+  <!-- 购物车按钮（悬浮，带件数角标） -->
+  <button type="button" id="xc-cart-btn" aria-label="打开购物车" aria-expanded="false">
+    <svg class="xc-cart-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="9" cy="20" r="1.6"></circle>
+      <circle cx="18" cy="20" r="1.6"></circle>
+      <path d="M2.5 3.5h2.7l2.6 12h10.5l2.2-8.4H6.4"></path>
+    </svg>
+    购物车<span id="xc-cart-badge" style="display:none">0</span>
+  </button>
+
+  <!-- 购物车面板 -->
+  <div id="xc-cart-panel" role="dialog" aria-label="购物车">
+    <div class="xc-cart-head">
+      已加入装备 <span id="xc-cart-num" class="rune-count"></span>
+      <span class="xc-head-fill"></span>
+      <button type="button" id="xc-cart-clear" class="xc-cart-mini-btn">清空</button>
+      <button type="button" id="xc-cart-close" class="xc-cart-close" aria-label="关闭购物车">×</button>
+    </div>
+    <div id="xc-cart-items"></div>
+    <div class="xc-cart-sum">
+      <h3>材料汇总</h3>
+      <div id="xc-cart-mats"></div>
+    </div>
+  </div>
+
   <script src="assets/version.js"></script>
+
+  <script>
+    "use strict";
+    var DATA = null, ICON_TPL = "", ICON_TPL_NUM = "";
+    var state = { dungeon: "Naxxramas" };
+    var cart = []; /* [{id, qty}] —— 纯内存，不持久化，刷新即清空 */
+
+    /* ============================================================
+     * 兑换材料定义 —— 占位数据，待真实兑换数据接入后替换。
+     * EXCHANGE_COST: 装备 itemID → [{ mat: 材料 itemID, count: 数量 }]
+     * 未收录的装备回落到 DEFAULT_COST（当前占位：1 × 坚固的石头 7912）。
+     * 真实数据到位后只需填这张表（或改为从数据文件加载），页面其余逻辑不用动。
+     * ============================================================ */
+    var DEFAULT_COST = [{ mat: "7912", count: 1 }];
+    var EXCHANGE_COST = {
+      /* 示例（接入真数据时按此结构填写）：
+      "236158": [
+        { mat: "21217", count: 20 }
+      ]
+      */
+    };
+    function costOf(id) { return EXCHANGE_COST[String(id)] || DEFAULT_COST; }
+
+    /* ---- 副本清单：前两个本次上线；安其拉神殿套装数据修复中，置灰不可选 ---- */
+    var DUNGEONS = [
+      { key: "Naxxramas" },
+      { key: "TheRuinsofAhnQiraj" },
+      { key: "TheTempleofAhnQiraj", disabled: true, tag: "数据修复中" }
+    ];
+    var CLASS_ORDER = ["战士", "圣骑士", "猎人", "潜行者", "牧师", "萨满", "法师", "术士", "德鲁伊"];
+
+    function $(id) { return document.getElementById(id); }
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function qOf(q) { return q == null ? 1 : q; }
+    function iconUrl(it) {
+      if (!it) return "";
+      if (it.ic) return ICON_TPL.replace("%s", it.ic);
+      if (it.icn) return ICON_TPL_NUM.replace("%s", it.icn);
+      return "";
+    }
+
+    /* ---- 以下 tooltip / 图标渲染与 loot.html 同源（复制内联，保持零构建单文件风格） ---- */
+    var QUAL_ZH = { 0: "粗糙", 1: "普通", 2: "精良", 3: "稀有", 4: "史诗", 5: "传说", 6: "神器" };
+    var CLASS_ZH = {
+      Warrior: "战士", Paladin: "圣骑士", Hunter: "猎人", Rogue: "潜行者", Priest: "牧师",
+      Shaman: "萨满祭司", Mage: "法师", Warlock: "术士", Druid: "德鲁伊"
+    };
+    function clsZh(s) {
+      if (!s) return "";
+      return s.split(",").map(function (x) {
+        x = x.trim();
+        return CLASS_ZH[x] || x;
+      }).join(" / ");
+    }
+    function iconImg(it, cls) {
+      var u = iconUrl(it);
+      if (!u) return '<span class="' + cls + '" style="display:inline-block"></span>';
+      return '<img class="' + cls + ' q' + qOf(it.q) + '" src="' + esc(u) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'" />';
+    }
+    function itemById(id) { return DATA.items[String(id)]; }
+
+    function buildTip(it, rate) {
+      var q = qOf(it.q);
+      var h = '<div class="ti">' + iconImg(it, "b" + q);
+      h += '<div><div class="nm q' + q + '">' + esc(it.n) + '</div>';
+      h += '<div class="qlabel q' + q + '">' + esc(QUAL_ZH[q] || "普通") + '</div></div></div>';
+      if (it.bd) h += '<div class="row muted">' + esc(it.bd) + '</div>';
+      if (it.cl) h += '<div class="row muted">职业：' + esc(clsZh(it.cl)) + '</div>';
+      if (it.il) h += '<div class="row itemLevel">物品等级 ' + esc(it.il) + '</div>';
+      h += '<div class="hr"></div>';
+      var head = [it.sl, it.tp].filter(Boolean).join(" · ");
+      if (head) h += '<div class="row muted">' + esc(head) + '</div>';
+      if (it.wp) {
+        it.wp.split(" / ").forEach(function (seg) {
+          if (!seg) return;
+          var cls = seg.indexOf("每秒伤害") >= 0 ? "row muted" : "row";
+          h += '<div class="' + cls + '">' + esc(seg) + '</div>';
+        });
+      }
+      if (it.ar) h += '<div class="row">' + esc(it.ar) + '</div>';
+      if (it.st && it.st.length) {
+        h += '<div class="hr"></div>';
+        it.st.forEach(function (s) { h += '<div class="row stat">' + esc(s) + '</div>'; });
+      }
+      if (it.ef && it.ef.length) {
+        h += '<div class="hr"></div>';
+        it.ef.forEach(function (s) { h += '<div class="row effect">' + esc(s) + '</div>'; });
+      }
+      if (it.sn || (it.se && it.se.length)) {
+        h += '<div class="hr"></div>';
+        if (it.sn) h += '<div class="row spec">' + esc(it.sn) + '</div>';
+        if (it.se) it.se.forEach(function (s) { h += '<div class="row spec">' + esc(s) + '</div>'; });
+      }
+      if (it.du) h += '<div class="row muted">' + esc(it.du) + '</div>';
+      if (it.mk && it.mk.length) h += '<div class="row itemLevel">' + esc(it.mk.join(" · ")) + '</div>';
+      if (it.rl) h += '<div class="row req">需要等级 ' + esc(it.rl) + '</div>';
+      if (rate != null && rate !== "") h += '<div class="row muted">掉率：' + esc(rate) + '%</div>';
+      if (it.sp) h += '<div class="row req">售价：' + esc(it.sp) + '</div>';
+      if (it.ph) h += '<div class="row muted">' + esc(String(it.ph).replace("Phase", "阶段")) + '</div>';
+      if (it.ds) h += '<div class="hr"></div><div class="row flavor">“' + esc(it.ds) + '”</div>';
+      return h;
+    }
+
+    var tipEl = null, tipVisible = false, curX = 0, curY = 0;
+    var TIP_OFFSET = 16;
+    function getTip() {
+      if (!tipEl) {
+        tipEl = document.createElement("div");
+        tipEl.className = "tooltip";
+        document.body.appendChild(tipEl);
+      }
+      return tipEl;
+    }
+    function positionTip() {
+      var el = tipEl;
+      if (!el || !tipVisible) return;
+      var r = el.getBoundingClientRect();
+      var x = curX + TIP_OFFSET, y = curY + TIP_OFFSET;
+      if (x + r.width > window.innerWidth - 8) x = curX - r.width - TIP_OFFSET;
+      if (y + r.height > window.innerHeight - 8) y = curY - r.height - TIP_OFFSET;
+      if (x < 8) x = 8;
+      if (y < 8) y = 8;
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+    }
+    function showTip(html, e) {
+      var el = getTip();
+      curX = e.clientX; curY = e.clientY;
+      el.innerHTML = html;
+      el.style.display = "block"; /* 注意：fixed 元素不能用 hidden 属性控制，会退回文档流 */
+      el.style.left = "0px";
+      el.style.top = "0px";
+      tipVisible = true;
+      positionTip();
+    }
+    function hideTip() {
+      if (tipEl) tipEl.style.display = "none";
+      tipVisible = false;
+    }
+    function tipOver(e) {
+      var el = e.target.closest ? e.target.closest("[data-id]") : null;
+      if (!el) return;
+      var it = itemById(el.getAttribute("data-id"));
+      if (it) showTip(buildTip(it, el.getAttribute("data-rate")), e);
+    }
+    function tipOut(e) {
+      var to = e.relatedTarget;
+      if (to && to.closest && to.closest("[data-id]")) return;
+      hideTip();
+    }
+
+    /* ---------- 数据取用 ---------- */
+    function findContent(key) {
+      for (var i = 0; i < DATA.modules.length; i++) {
+        var cs = DATA.modules[i].contents;
+        for (var j = 0; j < cs.length; j++) if (cs[j].key === key) return cs[j];
+      }
+      return null;
+    }
+    function setBossOf(content) {
+      var bs = (content && content.bosses) || [];
+      for (var i = 0; i < bs.length; i++) if (bs[i].kind === "set") return bs[i];
+      return null;
+    }
+    function groupClass(g) {
+      /* 组内职业字段实测 100% 一致且齐备，取首件 cl 即整组职业 */
+      var first = g.items.length ? itemById(g.items[0][0]) : null;
+      return (first && first.cl) || "其他";
+    }
+
+    /* ---------- 渲染：副本选择器 ---------- */
+    function renderPicker() {
+      var sel = $("xc-dungeon");
+      sel.innerHTML = "";
+      DUNGEONS.forEach(function (d) {
+        var c = findContent(d.key);
+        if (!c) return;
+        var o = document.createElement("option");
+        o.value = d.key;
+        o.textContent = c.zh + (d.tag ? "（" + d.tag + "）" : "");
+        if (d.disabled) o.disabled = true;
+        if (d.key === state.dungeon) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.onchange = function () {
+        var picked = null;
+        for (var i = 0; i < DUNGEONS.length; i++) if (DUNGEONS[i].key === this.value) picked = DUNGEONS[i];
+        if (!picked || picked.disabled) { this.value = state.dungeon; return; } /* 双保险：禁用项本不可选 */
+        state.dungeon = picked.key;
+        renderBody();
+      };
+    }
+
+    /* ---------- 渲染：装备列表 ---------- */
+    var XC_HEAD = '<colgroup><col style="width:52%"><col style="width:12%"><col style="width:16%"><col style="width:20%"></colgroup>'
+      + '<thead><tr><th>物品</th><th>等级</th><th>部位</th><th>操作</th></tr></thead><tbody>';
+
+    function rowHtml(id) {
+      var it = itemById(id);
+      if (!it) return "";
+      var q = qOf(it.q);
+      return '<tr class="loot-row" data-id="' + esc(id) + '">'
+        + '<td class="loot-name q' + q + '"><span class="loot-inner">'
+        + '<button type="button" class="sub-toggle" aria-label="展开兑换材料"></button>'
+        + iconImg(it, "item-icon") + esc(it.n) + "</span></td>"
+        + '<td class="loot-ilvl">' + (it.il || "-") + "</td>"
+        + '<td class="loot-slot">' + esc(it.sl || "-") + "</td>"
+        + '<td class="xc-act"><button type="button" class="xc-add" data-id="' + esc(id) + '">＋ 加入</button></td>'
+        + "</tr>";
+    }
+
+    function renderBody() {
+      var content = findContent(state.dungeon);
+      var boss = setBossOf(content);
+      if (!content || !boss || !boss.groups || !boss.groups.length) {
+        $("xc-body").innerHTML = '<p class="empty-note">该副本暂无套装数据。</p>';
+        $("xc-count").textContent = "";
+        return;
+      }
+      var byClass = {};
+      var total = 0;
+      boss.groups.forEach(function (g) {
+        var cls = groupClass(g);
+        (byClass[cls] = byClass[cls] || []).push(g);
+        total += g.items.length;
+      });
+      var order = Object.keys(byClass).sort(function (a, b) {
+        var ia = CLASS_ORDER.indexOf(a), ib = CLASS_ORDER.indexOf(b);
+        if (ia < 0) ia = 99;
+        if (ib < 0) ib = 99;
+        return ia - ib;
+      });
+      $("xc-count").textContent = content.zh + " · " + boss.name + " · " + boss.groups.length + " 组 · " + total + " 件";
+      var html = "";
+      order.forEach(function (cls) {
+        var gs = byClass[cls];
+        var cnt = gs.reduce(function (a, g) { return a + g.items.length; }, 0);
+        html += '<h2 class="slot-h">' + esc(cls) + ' <span>' + gs.length + " 组 · " + cnt + " 件</span></h2>";
+        gs.forEach(function (g) {
+          /* 数据里的 label 自带「（9 件）」后缀，剥掉后由 em 统一渲染，避免重复 */
+          var plainLabel = String(g.label).replace(/（\s*\d+\s*件\s*）\s*$/, "");
+          html += '<details class="fold-group"><summary>' + esc(plainLabel)
+            + " <em>" + g.items.length + " 件</em></summary>"
+            + '<table class="loot-table">' + XC_HEAD;
+          g.items.forEach(function (row) { html += rowHtml(row[0]); });
+          html += "</tbody></table></details>";
+        });
+      });
+      $("xc-body").innerHTML = html;
+    }
+
+    /* ---------- 展开：兑换材料面板 ---------- */
+    function buildCostPanel(id) {
+      var panel = document.createElement("div");
+      panel.className = "sub-panel";
+      var hint = document.createElement("div");
+      hint.className = "sub-hint";
+      hint.textContent = "兑换所需材料（占位数据，待真实兑换数据接入后替换）：";
+      panel.appendChild(hint);
+      var grid = document.createElement("div");
+      grid.className = "sub-grid";
+      costOf(id).forEach(function (c) {
+        var mat = itemById(c.mat);
+        if (!mat) return;
+        var wrap = document.createElement("div");
+        wrap.className = "sub-item-wrap";
+        var line = document.createElement("span");
+        line.className = "sub-item";
+        line.setAttribute("data-id", String(c.mat));
+        var img = document.createElement("img");
+        img.className = "item-icon q" + qOf(mat.q);
+        var u = iconUrl(mat);
+        if (u) { img.src = u; img.loading = "lazy"; } else { img.style.visibility = "hidden"; }
+        line.appendChild(img);
+        var nm = document.createElement("span");
+        nm.className = "q" + qOf(mat.q) + " sub-name";
+        nm.textContent = mat.n + " ×" + c.count;
+        line.appendChild(nm);
+        wrap.appendChild(line);
+        grid.appendChild(wrap);
+      });
+      panel.appendChild(grid);
+      return panel;
+    }
+
+    /* ---------- 购物车 ---------- */
+    function cartQty() { return cart.reduce(function (a, e) { return a + e.qty; }, 0); }
+    function addToCart(id) {
+      var e = null;
+      for (var i = 0; i < cart.length; i++) if (cart[i].id === String(id)) e = cart[i];
+      if (e) e.qty += 1; else cart.push({ id: String(id), qty: 1 });
+      renderCart();
+      bumpCartBtn();
+    }
+    function renderCart() {
+      var n = cartQty();
+      var badge = $("xc-cart-badge");
+      badge.textContent = n;
+      badge.style.display = n > 0 ? "" : "none";
+      $("xc-cart-num").textContent = n ? n + " 件" : "";
+      var items = $("xc-cart-items");
+      if (!cart.length) {
+        items.innerHTML = '<p class="xc-empty">购物车为空。点击装备行右侧「＋ 加入」把装备丢进来。</p>';
+      } else {
+        var h = "";
+        cart.forEach(function (e) {
+          var it = itemById(e.id);
+          if (!it) return;
+          h += '<div class="xc-line">'
+            + iconImg(it, "item-icon")
+            + '<span class="xc-line-name q' + qOf(it.q) + '" data-id="' + esc(e.id) + '">' + esc(it.n) + "</span>"
+            + '<span class="xc-step">'
+            + '<button type="button" class="xc-step-btn" data-act="dec" data-id="' + esc(e.id) + '" aria-label="减少一件">−</button>'
+            + '<span>' + e.qty + "</span>"
+            + '<button type="button" class="xc-step-btn" data-act="inc" data-id="' + esc(e.id) + '" aria-label="增加一件">＋</button>'
+            + "</span></div>";
+        });
+        items.innerHTML = h;
+      }
+      renderSummary();
+    }
+    /* 材料汇总：同种材料合并计数，数量按件数倍数累加 */
+    function renderSummary() {
+      var mats = {};
+      cart.forEach(function (e) {
+        costOf(e.id).forEach(function (c) {
+          mats[c.mat] = (mats[c.mat] || 0) + c.count * e.qty;
+        });
+      });
+      var ids = Object.keys(mats).sort(function (a, b) { return mats[b] - mats[a]; });
+      var mh = "";
+      ids.forEach(function (mid) {
+        var mat = itemById(mid);
+        if (!mat) return;
+        mh += '<div class="xc-mat-line" data-id="' + esc(mid) + '">'
+          + iconImg(mat, "item-icon")
+          + '<span class="q' + qOf(mat.q) + '">' + esc(mat.n) + "</span>"
+          + '<b class="xc-mat-n">×' + mats[mid] + "</b></div>";
+      });
+      $("xc-cart-mats").innerHTML = mh || '<p class="xc-empty">暂无材料。</p>';
+    }
+    /* 步进器：只改数量与汇总，不重建列表 DOM（保持按钮焦点，连点不费劲；减到 0 整行移除） */
+    function stepLine(id, delta) {
+      var e = null;
+      for (var i = 0; i < cart.length; i++) if (cart[i].id === String(id)) e = cart[i];
+      if (!e) return;
+      e.qty += delta;
+      if (e.qty <= 0) { cart.splice(cart.indexOf(e), 1); renderCart(); return; }
+      var nameEl = document.querySelector('#xc-cart-items .xc-line-name[data-id="' + id + '"]');
+      var line = nameEl ? nameEl.closest(".xc-line") : null;
+      if (line) line.querySelector(".xc-step span").textContent = e.qty;
+      renderSummary();
+      var n = cartQty();
+      var badge = $("xc-cart-badge");
+      badge.textContent = n;
+      badge.style.display = n > 0 ? "" : "none";
+      $("xc-cart-num").textContent = n ? n + " 件" : "";
+    }
+    function toggleCart(open) {
+      var p = $("xc-cart-panel"), b = $("xc-cart-btn");
+      var willOpen = open == null ? !p.classList.contains("xc-open") : open;
+      p.classList.toggle("xc-open", willOpen);
+      b.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    }
+    function bumpCartBtn() {
+      var b = $("xc-cart-btn");
+      b.classList.remove("xc-pop");
+      /* 重启动画 */
+      void b.offsetWidth;
+      b.classList.add("xc-pop");
+    }
+
+    /* ---------- 飞行动画：图标从按钮位置沿缓动弧线落入购物车 ---------- */
+    function flyToCart(srcEl, it) {
+      var btn = $("xc-cart-btn");
+      var a = srcEl.getBoundingClientRect(), b = btn.getBoundingClientRect();
+      var x0 = a.left + a.width / 2, y0 = a.top + a.height / 2;
+      var x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+      var el = document.createElement(it.ic || it.icn ? "img" : "div");
+      el.className = "xc-fly item-icon q" + qOf(it.q);
+      var u = iconUrl(it);
+      if (u) el.src = u;
+      document.body.appendChild(el);
+      var W = 28, arc = Math.min(140, 60 + Math.abs(y1 - y0) * 0.2), dur = 620;
+      function place(x, y, k, o) {
+        el.style.transform = "translate(" + (x - W / 2) + "px," + (y - W / 2) + "px) scale(" + k + ")";
+        el.style.opacity = o;
+      }
+      place(x0, y0, 1, 1);
+      var t0 = null;
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        var t = Math.min(1, (ts - t0) / dur);
+        /* easeInOutCubic：起步轻推、中段加速、收尾减速，配抛物线弧度更像被“丢”过去 */
+        var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        var x = x0 + (x1 - x0) * e;
+        var y = y0 + (y1 - y0) * e - Math.sin(t * Math.PI) * arc;
+        var k = 1 - 0.6 * e;
+        var o = t > 0.82 ? Math.max(0, 1 - (t - 0.82) / 0.18) : 1;
+        place(x, y, k, o);
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          el.remove();
+          bumpCartBtn();
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    /* ---------- 事件 ---------- */
+    /* 列表区：箭头展开材料 / ＋ 号加入购物车 */
+    $("xc-body").addEventListener("click", function (e) {
+      var add = e.target.closest ? e.target.closest("button.xc-add") : null;
+      if (add) {
+        var tr = add.closest("tr.loot-row");
+        var id = add.getAttribute("data-id");
+        var it = itemById(id);
+        if (it) {
+          var icon = tr ? tr.querySelector(".item-icon") : null;
+          flyToCart(icon || add, it);
+          addToCart(id);
+        }
+        return;
+      }
+      var btn = e.target.closest ? e.target.closest("button.sub-toggle") : null;
+      if (!btn) return;
+      var row = btn.closest("tr.loot-row");
+      if (!row) return;
+      var next = row.nextElementSibling;
+      if (next && next.classList.contains("xc-cost-row")) {
+        var hidden = next.style.display === "none";
+        next.style.display = hidden ? "" : "none";
+        btn.dataset.open = hidden ? "1" : "0";
+        return;
+      }
+      var tr2 = document.createElement("tr");
+      tr2.className = "xc-cost-row sub-row";
+      var td = document.createElement("td");
+      td.colSpan = 4;
+      td.appendChild(buildCostPanel(row.getAttribute("data-id")));
+      tr2.appendChild(td);
+      row.parentNode.insertBefore(tr2, row.nextSibling);
+      btn.dataset.open = "1";
+    });
+
+    /* 购物车：开关 / 步进 / 清空 */
+    $("xc-cart-btn").addEventListener("click", function () { toggleCart(); });
+    $("xc-cart-close").addEventListener("click", function () { toggleCart(false); });
+    $("xc-cart-clear").addEventListener("click", function () { cart = []; renderCart(); });
+    $("xc-cart-panel").addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest("button.xc-step-btn") : null;
+      if (!btn) return;
+      var line = btn.closest(".xc-line");
+      if (!line) return;
+      var id = btn.getAttribute("data-id");
+      stepLine(id, btn.getAttribute("data-act") === "inc" ? 1 : -1);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") toggleCart(false);
+    });
+
+    /* tooltip：document 级 mousemove + 滚动隐藏（前任事故：fixed tooltip 不能用 hidden 属性控制） */
+    document.addEventListener("mousemove", function (e) {
+      curX = e.clientX; curY = e.clientY;
+      if (tipVisible) positionTip();
+    });
+    $("xc-body").addEventListener("mouseover", tipOver);
+    $("xc-body").addEventListener("mouseout", tipOut);
+    $("xc-cart-panel").addEventListener("mouseover", tipOver);
+    $("xc-cart-panel").addEventListener("mouseout", tipOut);
+    $("xc-body").addEventListener("mouseleave", hideTip);
+    window.addEventListener("scroll", function () { if (tipVisible) hideTip(); }, true);
+
+    /* ---------- 启动 ---------- */
+    renderCart();
+    fetch("assets/loot-data.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (d) {
+        DATA = d;
+        ICON_TPL = (d.meta && d.meta.icon_cdn) || "https://render.worldofwarcraft.com/classic1x-us/icons/56/%s.jpg";
+        ICON_TPL_NUM = (d.meta && d.meta.icon_cdn_num) || "https://render.worldofwarcraft.com/icons/56/%s.jpg";
+        renderPicker();
+        renderBody();
+      })
+      .catch(function (e) {
+        $("xc-body").innerHTML = '<p class="empty-note">数据加载失败：' + esc(e.message) + "。请刷新重试。</p>";
+      });
+  </script>
 </body>
 </html>

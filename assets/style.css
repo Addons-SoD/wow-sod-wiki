@@ -539,3 +539,232 @@ footer {
 .tooltip .b3 { border-color: #0081ff; }
 .tooltip .b4 { border-color: #c600ff; }
 .tooltip .b5 { border-color: #ff8000; }
+
+/* ============================================================
+   装备兑换表页（套装兑换材料计算器）—— exchange.html 专用
+   全部选择器带 .xc- / #xc- 命名空间前缀，避免污染其它页面。
+   ============================================================ */
+
+/* 品质文字色的通用版本：现有 .q0–.q5 仅在 .loot-name/.tooltip 等限定上下文生效，
+   购物车/兑换页需要裸 .qN 着色（与英雄榜品质色一致，纯新增、不改既有规则） */
+.xc-line-name.q0, .xc-mat-line .q0 { color: #9d9d9d; }
+.xc-line-name.q1, .xc-mat-line .q1 { color: #ffffff; }
+.xc-line-name.q2, .xc-mat-line .q2 { color: #1eff00; }
+.xc-line-name.q3, .xc-mat-line .q3 { color: #0081ff; }
+.xc-line-name.q4, .xc-mat-line .q4 { color: #c600ff; }
+.xc-line-name.q5, .xc-mat-line .q5 { color: #ff8000; }
+
+/* 副本选择器：与 #loot-content 同款外观（复制而非改旧选择器） */
+#xc-dungeon {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  min-width: 240px;
+}
+#xc-dungeon:focus { outline: none; border-color: var(--accent); }
+.xc-pick-label { color: var(--muted); font-size: 0.9rem; }
+
+/* 装备行的「＋ 加入」按钮 */
+.xc-act { white-space: nowrap; }
+.xc-add {
+  background: rgba(200, 162, 75, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(200, 162, 75, 0.45);
+  border-radius: 6px;
+  padding: 0.14rem 0.6rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.xc-add:hover { background: rgba(200, 162, 75, 0.24); border-color: var(--accent); }
+.xc-add:active { transform: scale(0.95); }
+
+/* 展开行：兑换材料（沿用 .sub-row/.sub-panel 的展开观感，仅补行底色语义） */
+.xc-cost-row > td { background: rgba(0, 0, 0, 0.24); }
+
+/* 悬浮购物车按钮 */
+#xc-cart-btn {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 1500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.62rem 1.1rem;
+  background: linear-gradient(180deg, #2a2417, #1d1910);
+  color: var(--accent);
+  border: 1px solid rgba(200, 162, 75, 0.55);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#xc-cart-btn:hover { border-color: var(--accent); box-shadow: 0 8px 26px rgba(0, 0, 0, 0.65); }
+.xc-cart-ico { width: 20px; height: 20px; }
+#xc-cart-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #c0392b;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
+}
+/* 加入时按钮“弹一下”的反馈（动画结束后由 class 移除复位） */
+#xc-cart-btn.xc-pop { animation: xc-pop 0.32s ease-out; }
+@keyframes xc-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.16); }
+  100% { transform: scale(1); }
+}
+
+/* 飞入购物车的物品图标 */
+.xc-fly {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1600;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* 购物车面板 */
+#xc-cart-panel {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 5.2rem;
+  z-index: 1510;
+  width: min(360px, calc(100vw - 2.8rem));
+  max-height: min(62vh, 480px);
+  display: none;
+  flex-direction: column;
+  background: rgba(13, 15, 20, 0.97);
+  border: 1px solid rgba(200, 162, 75, 0.4);
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+#xc-cart-panel.xc-open { display: flex; }
+.xc-cart-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.xc-head-fill { flex: 1 1 auto; }
+.xc-cart-mini-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 0.12rem 0.55rem;
+  cursor: pointer;
+}
+.xc-cart-mini-btn:hover { color: var(--accent); border-color: var(--accent); }
+.xc-cart-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+}
+.xc-cart-close:hover { color: var(--text); }
+#xc-cart-items {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.35rem 0.9rem;
+}
+.xc-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(42, 47, 58, 0.6);
+  font-size: 0.86rem;
+}
+.xc-line:last-child { border-bottom: none; }
+.xc-line .item-icon { width: 20px; height: 20px; }
+.xc-line-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xc-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+  color: var(--text);
+  min-width: 4.6rem;
+  justify-content: space-between;
+}
+.xc-step-btn {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+.xc-step-btn:hover { border-color: var(--accent); color: var(--accent); }
+.xc-empty { color: var(--muted); font-size: 0.85rem; padding: 0.8rem 0; margin: 0; }
+.xc-cart-sum {
+  flex: 0 0 auto;
+  border-top: 1px solid rgba(200, 162, 75, 0.35);
+  background: rgba(28, 24, 15, 0.55);
+  padding: 0.55rem 0.9rem 0.7rem;
+}
+.xc-cart-sum h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.xc-mat-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+  padding: 0.16rem 0;
+}
+.xc-mat-line .item-icon { width: 20px; height: 20px; }
+.xc-mat-n { margin-left: auto; color: var(--text); font-weight: 600; }
+
+/* 窄屏：面板收窄贴边、按钮下移，避免遮挡内容列 */
+@media (max-width: 680px) {
+  #xc-cart-btn { right: 0.9rem; bottom: 0.9rem; padding: 0.55rem 0.95rem; }
+  #xc-cart-panel {
+    right: 0.9rem;
+    left: 0.9rem;
+    width: auto;
+    bottom: 4.4rem;
+    max-height: 56vh;
+  }
+}
