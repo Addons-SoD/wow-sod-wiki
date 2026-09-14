@@ -665,7 +665,7 @@ footer {
   bottom: 5.2rem;
   z-index: 1510;
   width: min(360px, calc(100vw - 2.8rem));
-  max-height: min(62vh, 480px);
+  max-height: min(70vh, 560px);
   display: none;
   flex-direction: column;
   background: rgba(13, 15, 20, 0.97);
@@ -709,9 +709,24 @@ footer {
 .xc-cart-close:hover { color: var(--text); }
 #xc-cart-items {
   flex: 1 1 auto;
+  min-height: 0;            /* flex 子项必须显式设 0，否则不收缩、内容撑破面板且不出滚动条 */
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.35rem 0.9rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 162, 75, 0.35) transparent;
 }
+#xc-cart-items::-webkit-scrollbar,
+.xc-cart-sum::-webkit-scrollbar { width: 8px; }
+#xc-cart-items::-webkit-scrollbar-track,
+.xc-cart-sum::-webkit-scrollbar-track { background: transparent; }
+#xc-cart-items::-webkit-scrollbar-thumb,
+.xc-cart-sum::-webkit-scrollbar-thumb {
+  background: rgba(200, 162, 75, 0.35);
+  border-radius: 4px;
+}
+#xc-cart-items::-webkit-scrollbar-thumb:hover,
+.xc-cart-sum::-webkit-scrollbar-thumb:hover { background: rgba(200, 162, 75, 0.6); }
 .xc-line {
   display: flex;
   align-items: center;
@@ -752,9 +767,14 @@ footer {
 .xc-empty { color: var(--muted); font-size: 0.85rem; padding: 0.8rem 0; margin: 0; }
 .xc-cart-sum {
   flex: 0 0 auto;
+  max-height: 42%;          /* 材料汇总过多时自身滚动，不挤掉上方已选装备列表 */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-top: 1px solid rgba(200, 162, 75, 0.35);
   background: rgba(28, 24, 15, 0.55);
   padding: 0.55rem 0.9rem 0.7rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 162, 75, 0.35) transparent;
 }
 .xc-cart-sum h3 {
   margin: 0 0 0.35rem;
