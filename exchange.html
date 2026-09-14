@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）套装兑换材料计算器：按副本 → 职业 → 套装选择装备，加入购物车并汇总兑换所需材料" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.3.5" />
+  <link rel="stylesheet" href="assets/style.css?v=0.3.6" />
 </head>
 <body>
   <header class="hero">
@@ -24,7 +24,8 @@
       点击装备前的 <strong>▸ 箭头</strong> 可展开该装备的兑换材料；点击右下角 <strong>购物车</strong> 查看已选装备与材料汇总（同种材料自动合并计数）。
       <br>
       <strong>兑换材料数据来源</strong>：游戏内商店实采（插件 SoDShopDumper，2 个账号 / 11 个角色分别记录后合并，已校验同一装备在各角色下材料一致，零冲突）。
-      目前 <strong>安其拉废墟（AQ20）8/9 套、安其拉神殿（AQ40）20/23 套</strong>已接入真实兑换材料，共 122 件；纳克萨玛斯（T3）尚未采集，未收录的装备仍按占位数据计（1 × 坚固的石头）。
+      目前 <strong>安其拉废墟（AQ20）8/9 套、安其拉神殿（AQ40）20/23 套</strong>已接入真实兑换材料，共 124 件；纳克萨玛斯（T3）尚未采集。
+      未采集的装备<strong>不显示任何材料</strong>（展开时提示「暂无兑换数据」），加入购物车也不会计入材料汇总。
       购物车是纯前端状态，<strong>刷新页面即清空</strong>，仅作兑换计算辅助。装备展示与悬停详情复用掉落查询页的数据与样式。
     </div>
 
@@ -81,10 +82,9 @@
      * EXCHANGE_COST: 装备 itemID → [{ mat: 材料 itemID, count: 数量 }]
      * 数据来源：游戏内商店实采（插件 SoDShopDumper，2 个账号 / 11 个角色分别记录后合并，
      *           已校验同一装备在各角色下的兑换材料一致，零冲突）。
-     * 当前进度：安其拉废墟 8/9 套；安其拉神殿 20/23 套，共 122 件。
-     * 未收录的装备回落到 DEFAULT_COST（占位：1 × 坚固的石头 7912）。
+     * 当前进度：安其拉废墟 8/9 套；安其拉神殿 20/23 套，共 124 件。
+     * 未收录的装备不再使用占位数据，页面会提示「暂无兑换数据」。
      * ============================================================ */
-    var DEFAULT_COST = [{ mat: "7912", count: 1 }];
     var EXCHANGE_COST = {
       /* ======== 安其拉废墟（8/9 套，24 件） ======== */
       /* ---- 魔法的秘密（3 件） ---- */
@@ -119,7 +119,7 @@
       "233442": [{ mat: "20886", count: 1 }, { mat: "20873", count: 1 }, { mat: "20862", count: 5 }], /* 坚定力量之镰 */
       "233441": [{ mat: "20885", count: 1 }, { mat: "20867", count: 1 }, { mat: "20864", count: 5 }], /* 坚定力量披风 */
       "233443": [{ mat: "20884", count: 1 }, { mat: "20868", count: 1 }, { mat: "20865", count: 5 }], /* 坚定力量之戒 */
-      /* ======== 安其拉神殿（18/23 套，98 件） ======== */
+      /* ======== 安其拉神殿（20/23 套，100 件） ======== */
       /* ---- 起源之慷慨（5 件） ---- */
       "233723": [{ mat: "233365", count: 1 }, { mat: "20879", count: 1 }, { mat: "20863", count: 5 }], /* 起源面罩 */
       "233722": [{ mat: "233369", count: 1 }, { mat: "20881", count: 1 }, { mat: "20864", count: 5 }], /* 起源护肩 */
@@ -207,11 +207,13 @@
       /* ---- 死亡执行者的热血（5 件） ---- */
       "233388": [{ mat: "233368", count: 1 }, { mat: "20882", count: 1 }, { mat: "20859", count: 5 }], /* 死亡执行者的头盔 */
       "233387": [{ mat: "233371", count: 1 }, { mat: "20874", count: 1 }, { mat: "20863", count: 5 }], /* 死亡执行者的护肩 */
+      "233389": [{ mat: "233364", count: 1 }, { mat: "20881", count: 1 }, { mat: "20865", count: 5 }], /* 死亡执行者的胸甲 */
       "233390": [{ mat: "233368", count: 1 }, { mat: "20875", count: 1 }, { mat: "20862", count: 5 }], /* 死亡执行者的护腿 */
       "233391": [{ mat: "233371", count: 1 }, { mat: "20881", count: 1 }, { mat: "20864", count: 5 }], /* 死亡执行者的长靴 */
       /* ---- 死亡执行者的战衣（5 件） ---- */
       "233661": [{ mat: "233368", count: 1 }, { mat: "20882", count: 1 }, { mat: "20863", count: 5 }], /* 死亡执行者的护面 */
       "233663": [{ mat: "233371", count: 1 }, { mat: "20874", count: 1 }, { mat: "20860", count: 5 }], /* 死亡执行者的肩铠 */
+      "233659": [{ mat: "233364", count: 1 }, { mat: "20881", count: 1 }, { mat: "20861", count: 5 }], /* 死亡执行者的胸铠 */
       "233662": [{ mat: "233368", count: 1 }, { mat: "20875", count: 1 }, { mat: "20858", count: 5 }], /* 死亡执行者的裤子 */
       "233660": [{ mat: "233371", count: 1 }, { mat: "20881", count: 1 }, { mat: "20862", count: 5 }], /* 死亡执行者的步履 */
       /* ---- 厄运召唤者的腐蚀（5 件） ---- */
@@ -239,7 +241,8 @@
       "233374": [{ mat: "233367", count: 1 }, { mat: "20876", count: 1 }, { mat: "20865", count: 5 }], /* 征服者的腿铠 */
       "233372": [{ mat: "233370", count: 1 }, { mat: "20882", count: 1 }, { mat: "20865", count: 5 }], /* 征服者的胫甲 */
     };
-    function costOf(id) { return EXCHANGE_COST[String(id)] || DEFAULT_COST; }
+    /* 只有采集到真实数据的装备才有兑换材料；未采集的返回 null（不再用占位数据） */
+    function costOf(id) { return EXCHANGE_COST[String(id)] || null; }
 
     /* ---- 副本清单：三个副本套装均已接入 ---- */
     var DUNGEONS = [
@@ -478,11 +481,17 @@
       panel.className = "sub-panel";
       var hint = document.createElement("div");
       hint.className = "sub-hint";
-      hint.textContent = "兑换所需材料（占位数据，待真实兑换数据接入后替换）：";
+      var costs = costOf(id);
+      if (!costs) {
+        hint.textContent = "暂无兑换数据：该装备的兑换材料尚未采集。";
+        panel.appendChild(hint);
+        return panel;
+      }
+      hint.textContent = "兑换所需材料：";
       panel.appendChild(hint);
       var grid = document.createElement("div");
       grid.className = "sub-grid";
-      costOf(id).forEach(function (c) {
+      costs.forEach(function (c) {
         var mat = itemById(c.mat);
         if (!mat) return;
         var wrap = document.createElement("div");
@@ -542,11 +551,13 @@
       }
       renderSummary();
     }
-    /* 材料汇总：同种材料合并计数，数量按件数倍数累加 */
+    /* 材料汇总：同种材料合并计数，数量按件数倍数累加；尚未采集数据的装备单独列出 */
     function renderSummary() {
-      var mats = {};
+      var mats = {}, noData = [];
       cart.forEach(function (e) {
-        costOf(e.id).forEach(function (c) {
+        var cs = costOf(e.id);
+        if (!cs) { noData.push(e); return; }
+        cs.forEach(function (c) {
           mats[c.mat] = (mats[c.mat] || 0) + c.count * e.qty;
         });
       });
@@ -560,7 +571,18 @@
           + '<span class="q' + qOf(mat.q) + '">' + esc(mat.n) + "</span>"
           + '<b class="xc-mat-n">×' + mats[mid] + "</b></div>";
       });
-      $("xc-cart-mats").innerHTML = mh || '<p class="xc-empty">暂无材料。</p>';
+      var box = $("xc-cart-mats");
+      box.innerHTML = mh || '<p class="xc-empty">暂无材料。</p>';
+      if (noData.length) {
+        var names = noData.map(function (e) {
+          var it = itemById(e.id);
+          return it ? it.n : ("#" + e.id);
+        });
+        var p = document.createElement("p");
+        p.className = "xc-empty";
+        p.textContent = "另有 " + noData.length + " 件尚未采集兑换数据，未计入材料：" + names.join("、");
+        box.appendChild(p);
+      }
     }
     /* 步进器：只改数量与汇总，不重建列表 DOM（保持按钮焦点，连点不费劲；减到 0 整行移除） */
     function stepLine(id, delta) {
