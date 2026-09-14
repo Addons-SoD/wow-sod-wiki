@@ -767,7 +767,9 @@ footer {
 .xc-empty { color: var(--muted); font-size: 0.85rem; padding: 0.8rem 0; margin: 0; }
 .xc-cart-sum {
   flex: 0 0 auto;
-  max-height: 42%;          /* 材料汇总过多时自身滚动，不挤掉上方已选装备列表 */
+  /* 面板 max-height 是 70vh/560px，这里取一半上限；百分比高度对 auto 高度的父元素无效，
+     所以必须用 vh/px 而不是 50% */
+  max-height: min(35vh, 280px);
   overflow-y: auto;
   overscroll-behavior: contain;
   border-top: 1px solid rgba(200, 162, 75, 0.35);
@@ -777,10 +779,15 @@ footer {
   scrollbar-color: rgba(200, 162, 75, 0.35) transparent;
 }
 .xc-cart-sum h3 {
+  position: sticky;        /* 滚动材料列表时标题保持可见 */
+  top: -0.55rem;
   margin: 0 0 0.35rem;
+  padding-top: 0.55rem;
+  background: #1b1810;
   font-size: 0.85rem;
   color: var(--accent);
   letter-spacing: 0.05em;
+  z-index: 1;
 }
 .xc-mat-line {
   display: flex;
