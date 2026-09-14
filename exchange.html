@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）套装兑换材料计算器：按副本 → 职业 → 套装选择装备，加入购物车并汇总兑换所需材料" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.3.7" />
+  <link rel="stylesheet" href="assets/style.css?v=0.3.8" />
 </head>
 <body>
   <header class="hero">
@@ -20,13 +20,9 @@
 
   <main>
     <div class="notice">
-      本页用于计算套装装备兑换所需材料：先选择副本，按职业与套装浏览装备，点击 <strong>＋ 加入</strong> 把装备丢进右下角的购物车；
-      点击装备前的 <strong>▸ 箭头</strong> 可展开该装备的兑换材料；点击右下角 <strong>购物车</strong> 查看已选装备与材料汇总（同种材料自动合并计数）。
+      支持 <strong>纳克萨玛斯、安其拉神殿、安其拉废墟</strong> 的套装兑换材料计算：按 <strong>副本 → 职业 → 套装</strong> 浏览装备，点 <strong>＋ 加入</strong> 丢进右下角购物车，即可汇总兑换所需材料（同种材料自动合并计数）。
       <br>
-      <strong>兑换材料数据来源</strong>：游戏内商店实采（插件 SoDShopDumper，2 个账号 / 12 个角色分别记录后合并，已校验同一装备在各角色下材料一致，零冲突）。
-      目前 <strong>纳克萨玛斯（T3）20/23 套、安其拉神殿（AQ40）20/23 套、安其拉废墟（AQ20）8/9 套</strong>已接入真实兑换材料，共 304 件。
-      尚缺的均为<strong>圣骑士</strong>套装（T3 救赎三套 / AQ40 复仇者三套 / AQ20 永恒的公正），<strong>暂不列出</strong>；未采集的装备展开时提示「暂无兑换数据」，加入购物车也不计入材料汇总。
-      购物车是纯前端状态，<strong>刷新页面即清空</strong>，仅作兑换计算辅助。装备展示与悬停详情复用掉落查询页的数据与样式。
+      材料为<strong>游戏内商店实采</strong>数据；圣骑士套装尚未采集，暂不列出。购物车为纯前端状态，刷新即清空。
     </div>
 
     <div class="toolbar">

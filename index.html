@@ -7,7 +7,7 @@
   <meta name="description" content="魔兽世界怀旧服 · 探索赛季（Season of Discovery, SoD）玩家资料 Wiki" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.3.7" />
+  <link rel="stylesheet" href="assets/style.css?v=0.3.8" />
 </head>
 <body>
   <header class="hero">
@@ -19,7 +19,7 @@
 
   <main>
     <div class="notice">
-      本站目前为初始骨架页面，正在逐步建设。内容仅供玩家参考，欢迎通过 Pull Request 一起补充、修正。
+      本站为玩家社区项目，汇集探索赛季（SoD）的符文、掉落与套装兑换资料，持续建设中。内容仅供参考，欢迎通过 Pull Request 补充、修正。
     </div>
 
     <h2>什么是探索赛季？</h2>
@@ -36,18 +36,32 @@
 
     <h2>资料导航</h2>
     <div class="grid">
-      <a class="card" href="runes.html"><h3>符文指南</h3><p>按职业与装备槽位整理各符文的获取与效果（建设中）</p></a>
+      <a class="card" href="runes.html"><h3>符文指南</h3><p>按职业与装备槽位整理各符文的获取与效果</p></a>
       <a class="card" href="leveling.html"><h3>升级指南</h3><p>阶段等级上限、经验机制与升级路线速查（建设中）</p></a>
-      <a class="card" href="exchange.html"><h3>装备兑换表</h3><p>团队副本、PVP 与活动货币兑换装备速查（建设中）</p></a>
+      <a class="card" href="exchange.html"><h3>装备兑换表</h3><p>团队副本套装兑换材料计算器（纳克萨玛斯 / 安其拉）</p></a>
       <a class="card" href="loot.html"><h3>掉落查询</h3><p>副本 / 团队 / 专业 / 声望 / PvP / 活动掉落一览</p></a>
       <a class="card" href="https://github.com/Addons-SoD/wow-sod-wiki"><h3>参与贡献</h3><p>仓库源码、Issue 与 Pull Request 入口</p></a>
     </div>
+
+    <h2>SoD 修复版插件包管理器</h2>
+    <p>
+      一键把探索赛季插件整套装好、并随时保持更新：<a href="https://github.com/Addons-SoD/Addons-init/releases/latest" rel="noopener"><strong>下载 Addons-init.cmd（最新版）</strong></a>。
+      它由 <a href="https://github.com/Addons-SoD/Addons-Fetcher" rel="noopener">Addons-Fetcher</a> 驱动，会自动从 CurseForge 与 Addons-SoD 仓库获取适配 SoD 的插件版本，并部署到游戏插件目录。
+    </p>
+    <ol class="toc">
+      <li>下载 <code>Addons-init.cmd</code>（约 17 KB）。</li>
+      <li>把它放进游戏目录的 <code>_classic_era_\Interface</code> 文件夹（与 <code>AddOns</code> 同级）。</li>
+      <li>双击运行，等脚本自动跑完即可，插件会装进 <code>Interface\AddOns</code>。</li>
+      <li>以后要更新插件，重复第 3 步即可（会自动拉取最新版本）。</li>
+    </ol>
+    <p>要求：Windows + PowerShell 5.1 以上，能访问 GitHub；脚本自带备用下载源，直连不畅时会自动切换。</p>
 
     <h2>相关链接</h2>
     <ul class="toc">
       <li><a href="https://worldofwarcraft.blizzard.com/zh-tw/classic" rel="noopener">魔兽世界（亚服）官方网站</a></li>
       <li><a href="https://us.forums.blizzard.com/en/wow/c/wow-classic/season-of-discovery" rel="noopener">官方探索赛季论坛（英文）</a></li>
       <li><a href="https://www.wowhead.com/classic/guide/season-of-discovery/leveling-overview-guide" rel="noopener">Wowhead 探索赛季升级指南（英文）</a></li>
+      <li><a href="https://www.curseforge.cc/download.html" rel="noopener">CurseForge 插件下载站（curseforge.cc）</a></li>
     </ul>
   </main>
 

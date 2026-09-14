@@ -135,6 +135,17 @@ a { color: var(--link); }
 .card p { margin: 0; font-size: 0.88rem; color: var(--muted); }
 ul.toc { padding-left: 1.2rem; }
 ul.toc li { margin: 0.35rem 0; }
+ol.toc { padding-left: 1.5rem; }
+ol.toc li { margin: 0.35rem 0; }
+code {
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
+  font-size: 0.88em;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+}
 
 /* ---- 符文指南页 ---- */
 table {
@@ -402,9 +413,13 @@ footer {
 .fold-group > summary::before {
   content: "▸";
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  flex: none;
+  transition: color 0.15s;
 }
 .fold-group[open] > summary::before { content: "▾"; }
+.fold-group:hover > summary::before { color: var(--accent); }
 .fold-group > summary em {
   font-style: normal;
   font-size: 0.78rem;
