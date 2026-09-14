@@ -1,0 +1,12 @@
+## Interface: 11509
+## Title: |cffc8a24bSoD|r Shop Dumper
+## Notes: 与 NPC 商店对话时记录商品与兑换材料，用于 wow-sod-wiki 数据收集
+## Notes-zhCN: 与 NPC 商店对话时记录商品与兑换材料
+## Notes-zhTW: 與 NPC 商店對話時記錄商品與兌換材料
+## Author: wow-sod-wiki
+## Version: 1.0.0
+## SavedVariables: SoDShopDumperDB
+## X-Category: Data
+## X-Website: https://github.com/Addons-SoD/wow-sod-wiki
+
+SoDShopDumper.lua
