@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理全部符文效果与获取方式" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.2" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.3" />
 </head>
 <body>
   <header class="hero">
@@ -146,8 +146,9 @@
       renderList();
     });
 
-    /* 数据文件多源加载（与掉落查询页同策略）：GitHub Pages 到国内线路对本站文件偏慢，
-       改走 jsDelivr 的 gcore 节点；每个源 12 秒超时，失败自动回退，最后回退同源。
+    /* 数据文件多源加载（与掉落查询/装备兑换页同策略）：GitHub Pages 到国内线路对本站
+       大文件极慢（实测 loot-data.json 60 秒只下到 320KB），jsDelivr 节点 2 秒级完成。
+       三个源同时发起（并行竞速），第一个成功的胜出，其余立即中止；每源 15 秒超时。
        版本号取自样式表链接的 ?v=，与发布流程自动同步。 */
     var ASSET_V = (function () {
       var l = document.querySelector('link[href*="style.css?v="]');
@@ -160,18 +161,28 @@
       "assets/rune-data.json?v=" + ASSET_V
     ];
     function loadRuneData() {
-      var i = 0;
-      function next() {
-        if (i >= DATA_URLS.length) return Promise.reject(new Error("所有数据源均不可用"));
-        var url = DATA_URLS[i++];
-        var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
-        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
-        return fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
-          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-          .then(function (d) { clearTimeout(timer); return d; })
-          .catch(function () { clearTimeout(timer); return next(); });
-      }
-      return next();
+      return new Promise(function (resolve, reject) {
+        var pending = DATA_URLS.length, settled = false, ctrls = [];
+        function win(d) {
+          if (settled) return;
+          settled = true;
+          ctrls.forEach(function (c) { try { c.abort(); } catch (e) {} });
+          resolve(d);
+        }
+        function lose() {
+          if (settled) return;
+          if (--pending <= 0) { settled = true; reject(new Error("所有数据源均不可用")); }
+        }
+        DATA_URLS.forEach(function (url) {
+          var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+          if (ctrl) ctrls.push(ctrl);
+          var timer = setTimeout(function () { if (ctrl) ctrl.abort(); lose(); }, 15000);
+          fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+            .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+            .then(function (d) { clearTimeout(timer); win(d); })
+            .catch(function () { clearTimeout(timer); lose(); });
+        });
+      });
     }
     loadRuneData()
       .then(function (d) {
