@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理全部符文效果与获取方式" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.4" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.5" />
 </head>
 <body>
   <header class="hero">
@@ -155,9 +155,12 @@
       var m = l && l.getAttribute("href").match(/[?&]v=([\d.]+)/);
       return m ? m[1] : "";
     })();
+    /* CDN 引用用具体 commit hash（jsDelivr 对 @main 分支引用的解析有数小时延迟）。
+       发布脚本在提交数据后会把 DATA_REF 替换为该 hash。 */
+    var DATA_REF = "6949583";
     var DATA_URLS = [
-      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/rune-data.json?v=" + ASSET_V,
-      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/rune-data.json?v=" + ASSET_V,
+      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/rune-data.json?v=" + ASSET_V,
+      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/rune-data.json?v=" + ASSET_V,
       "assets/rune-data.json?v=" + ASSET_V
     ];
     function loadRuneData() {

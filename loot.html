@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.4" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.5" />
 </head>
 <body>
   <header class="hero">
@@ -442,9 +442,14 @@
       var m = l && l.getAttribute("href").match(/[?&]v=([\d.]+)/);
       return m ? m[1] : "";
     })();
+    /* CDN 引用用「具体 commit hash」而不是 @main：jsDelivr 对分支引用的解析有数小时延迟
+       （purge 只清文件缓存，清不掉它内部的 分支→commit 映射），换成 hash 才能保证发版后
+       CDN 立刻拿到新数据 —— hash 指向包含本次数据的那个提交。
+       发布脚本在提交数据后会把下面的 DATA_REF 替换为该 hash。 */
+    var DATA_REF = "6949583";
     var DATA_URLS = [
-      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/loot-data.json?v=" + ASSET_V,
-      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/loot-data.json?v=" + ASSET_V,
+      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/loot-data.json?v=" + ASSET_V,
+      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/loot-data.json?v=" + ASSET_V,
       "assets/loot-data.json?v=" + ASSET_V
     ];
     /* 并行竞速：三个源同时发请求，第一个「版本校验通过」的胜出，其余立即中止。
