@@ -31,7 +31,10 @@ body::before {
   inset: 0;
   z-index: -1;
   transform: translateZ(0); /* 提升为独立合成层，减少滚动/跳转时重绘 */
-  background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)), url("bg.jpeg");
+  /* 背景图走 jsDelivr（GitHub Pages 到国内线路极慢）。assets/scripts/site.js 会探测可用源，
+     失败时依次回退备用 CDN、最后回退本站同源，并通过 --bg-image 覆盖这里的默认值。 */
+  background-image: linear-gradient(rgba(7, 10, 16, 0.86), rgba(7, 10, 16, 0.86)),
+    var(--bg-image, url("https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/bg.jpeg"));
   background-repeat: repeat, no-repeat;
   background-size: auto, cover;
   background-position: center;

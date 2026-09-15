@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -6,8 +6,8 @@
   <title>符文指南 · 魔兽世界探索赛季 Wiki</title>
   <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理全部符文效果与获取方式" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
-  <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.5" />
+  <link rel="preload" as="image" href="https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/bg.jpeg" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.6" />
 </head>
 <body>
   <header class="hero">
@@ -46,18 +46,14 @@
     <p>本 Wiki 为玩家社区项目，与暴雪娱乐（Blizzard Entertainment）无隶属关系。<span class="site-version" data-version>v…</span></p>
   </footer>
 
-  <script src="assets/version.js"></script>
+  <script src="assets/scripts/common.js"></script>
+  <script src="assets/scripts/site.js"></script>
 
   <script>
     "use strict";
     var DATA = null;
     var state = { cls: 0, slot: null, q: "" };
 
-    function $(id) { return document.getElementById(id); }
-    function esc(s) {
-      return String(s == null ? "" : s)
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
     function fmt(s) { return esc(s).replace(/\n/g, "<br>"); }
     function qClass(q) { return "q-" + (q || "none"); }
 
@@ -146,48 +142,9 @@
       renderList();
     });
 
-    /* 数据文件多源加载（与掉落查询/装备兑换页同策略）：GitHub Pages 到国内线路对本站
-       大文件极慢（实测 loot-data.json 60 秒只下到 320KB），jsDelivr 节点 2 秒级完成。
-       三个源同时发起（并行竞速），第一个成功的胜出，其余立即中止；每源 15 秒超时。
-       版本号取自样式表链接的 ?v=，与发布流程自动同步。 */
-    var ASSET_V = (function () {
-      var l = document.querySelector('link[href*="style.css?v="]');
-      var m = l && l.getAttribute("href").match(/[?&]v=([\d.]+)/);
-      return m ? m[1] : "";
-    })();
-    /* CDN 引用用具体 commit hash（jsDelivr 对 @main 分支引用的解析有数小时延迟）。
-       发布脚本在提交数据后会把 DATA_REF 替换为该 hash。 */
-    var DATA_REF = "6949583";
-    var DATA_URLS = [
-      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/rune-data.json?v=" + ASSET_V,
-      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@" + DATA_REF + "/assets/rune-data.json?v=" + ASSET_V,
-      "assets/rune-data.json?v=" + ASSET_V
-    ];
-    function loadRuneData() {
-      return new Promise(function (resolve, reject) {
-        var pending = DATA_URLS.length, settled = false, ctrls = [];
-        function win(d) {
-          if (settled) return;
-          settled = true;
-          ctrls.forEach(function (c) { try { c.abort(); } catch (e) {} });
-          resolve(d);
-        }
-        function lose() {
-          if (settled) return;
-          if (--pending <= 0) { settled = true; reject(new Error("所有数据源均不可用")); }
-        }
-        DATA_URLS.forEach(function (url) {
-          var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
-          if (ctrl) ctrls.push(ctrl);
-          var timer = setTimeout(function () { if (ctrl) ctrl.abort(); lose(); }, 15000);
-          fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
-            .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-            .then(function (d) { clearTimeout(timer); win(d); })
-            .catch(function () { clearTimeout(timer); lose(); });
-        });
-      });
-    }
-    loadRuneData()
+    /* 数据文件多源加载（与掉落查询/装备兑换页共用同一套策略，见 assets/scripts/site.js）：
+       版本校验通过的那一份胜出，全部失败时退回可用的旧数据，避免白屏。 */
+    SoDSite.loadData("rune-data.json")
       .then(function (d) {
         DATA = d;
         renderTabs(); renderSlots(); renderList();
