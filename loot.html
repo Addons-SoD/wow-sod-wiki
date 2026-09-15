@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.3" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.4" />
 </head>
 <body>
   <header class="hero">
@@ -448,11 +448,11 @@
       "assets/loot-data.json?v=" + ASSET_V
     ];
     /* 并行竞速：三个源同时发请求，第一个「版本校验通过」的胜出，其余立即中止。
-       串行回退在实测中最坏要等 2s(gcore 旧缓存) + 10s(主域波动) + 130s(同源) 才出结果；
-       并行后最坏情况也只是「最快且版本正确的那个源」的耗时。 */
+       若所有源都失败、或版本都不符，则退回「版本不符但内容可用」的那一份，避免白屏
+       （CDN 缓存更新有延迟，刚发版后的短时间内会走到这条兜底路径）。 */
     function loadLootData() {
       return new Promise(function (resolve, reject) {
-        var pending = DATA_URLS.length, settled = false, ctrls = [];
+        var pending = DATA_URLS.length, settled = false, ctrls = [], stale = null;
         function win(d) {
           if (settled) return;
           settled = true;
@@ -461,7 +461,11 @@
         }
         function lose() {
           if (settled) return;
-          if (--pending <= 0) { settled = true; reject(new Error("所有数据源均不可用")); }
+          if (--pending <= 0) {
+            settled = true;
+            if (stale) { resolve(stale); return; }   /* 兜底：旧数据也好过打不开 */
+            reject(new Error("所有数据源均不可用"));
+          }
         }
         DATA_URLS.forEach(function (url) {
           var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
@@ -473,6 +477,7 @@
               clearTimeout(timer);
               var v = (d.meta && d.meta.wiki_version) || "";
               if (ASSET_V && v !== ASSET_V) {
+                if (!stale) stale = d;
                 throw new Error("数据版本 " + (v || "未知") + " 与页面 " + ASSET_V + " 不符");
               }
               win(d);
