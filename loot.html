@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.1" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.2" />
 </head>
 <body>
   <header class="hero">
@@ -447,24 +447,39 @@
       "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/loot-data.json?v=" + ASSET_V,
       "assets/loot-data.json?v=" + ASSET_V
     ];
+    /* 并行竞速：三个源同时发请求，第一个「版本校验通过」的胜出，其余立即中止。
+       串行回退在实测中最坏要等 2s(gcore 旧缓存) + 10s(主域波动) + 130s(同源) 才出结果；
+       并行后最坏情况也只是「最快且版本正确的那个源」的耗时。 */
     function loadLootData() {
-      var i = 0;
-      function next() {
-        if (i >= DATA_URLS.length) return Promise.reject(new Error("所有数据源均不可用"));
-        var url = DATA_URLS[i++];
-        var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
-        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
-        return fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
-          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-          .then(function (d) {
-            clearTimeout(timer);
-            var v = (d.meta && d.meta.wiki_version) || "";
-            if (ASSET_V && v && v !== ASSET_V) throw new Error("数据版本 " + v + " 与页面 " + ASSET_V + " 不符");
-            return d;
-          })
-          .catch(function () { clearTimeout(timer); return next(); });
-      }
-      return next();
+      return new Promise(function (resolve, reject) {
+        var pending = DATA_URLS.length, settled = false, ctrls = [];
+        function win(d) {
+          if (settled) return;
+          settled = true;
+          ctrls.forEach(function (c) { try { c.abort(); } catch (e) {} });
+          resolve(d);
+        }
+        function lose() {
+          if (settled) return;
+          if (--pending <= 0) { settled = true; reject(new Error("所有数据源均不可用")); }
+        }
+        DATA_URLS.forEach(function (url) {
+          var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+          if (ctrl) ctrls.push(ctrl);
+          var timer = setTimeout(function () { if (ctrl) ctrl.abort(); lose(); }, 15000);
+          fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+            .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+            .then(function (d) {
+              clearTimeout(timer);
+              var v = (d.meta && d.meta.wiki_version) || "";
+              if (ASSET_V && v !== ASSET_V) {
+                throw new Error("数据版本 " + (v || "未知") + " 与页面 " + ASSET_V + " 不符");
+              }
+              win(d);
+            })
+            .catch(function () { clearTimeout(timer); lose(); });
+        });
+      });
     }
 
     loadLootData()
