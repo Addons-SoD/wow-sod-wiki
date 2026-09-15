@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）装备掉落查询：副本、团队、专业、声望、PvP 与活动掉落一览，悬停查看完整属性" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.0" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.1" />
 </head>
 <body>
   <header class="hero">
@@ -431,8 +431,43 @@
     $("loot-body").addEventListener("mouseleave", hideTip);
     window.addEventListener("scroll", function () { if (tipVisible) hideTip(); }, true);
 
-    fetch("assets/loot-data.json", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    /* 数据文件多源加载 ---------------------------------------------------------
+       起因：GitHub Pages 到国内线路对本站大文件极慢（实测 loot-data.json 压缩后
+       539KB，60 秒仅下到 320KB 就断），而同一文件在 jsDelivr 的 gcore 节点 2.3 秒完成。
+       策略：按顺序尝试各源，每个 12 秒超时；拿到数据后校验 meta.wiki_version 与本页
+       版本号一致（防止 CDN 缓存返回旧数据），不一致就继续试下一个源。
+       本页版本号取自样式表链接的 ?v=，与发布流程自动同步。 */
+    var ASSET_V = (function () {
+      var l = document.querySelector('link[href*="style.css?v="]');
+      var m = l && l.getAttribute("href").match(/[?&]v=([\d.]+)/);
+      return m ? m[1] : "";
+    })();
+    var DATA_URLS = [
+      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/loot-data.json?v=" + ASSET_V,
+      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/loot-data.json?v=" + ASSET_V,
+      "assets/loot-data.json?v=" + ASSET_V
+    ];
+    function loadLootData() {
+      var i = 0;
+      function next() {
+        if (i >= DATA_URLS.length) return Promise.reject(new Error("所有数据源均不可用"));
+        var url = DATA_URLS[i++];
+        var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
+        return fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+          .then(function (d) {
+            clearTimeout(timer);
+            var v = (d.meta && d.meta.wiki_version) || "";
+            if (ASSET_V && v && v !== ASSET_V) throw new Error("数据版本 " + v + " 与页面 " + ASSET_V + " 不符");
+            return d;
+          })
+          .catch(function () { clearTimeout(timer); return next(); });
+      }
+      return next();
+    }
+
+    loadLootData()
       .then(function (d) {
         DATA = d;
         ICON_TPL = (d.meta && d.meta.icon_cdn) || "https://render.worldofwarcraft.com/classic1x-us/icons/56/%s.jpg";

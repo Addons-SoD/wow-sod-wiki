@@ -7,7 +7,7 @@
   <meta name="description" content="探索赛季（SoD）符文指南：按职业与装备槽位整理全部符文效果与获取方式" />
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="preload" as="image" href="assets/bg.jpeg" />
-  <link rel="stylesheet" href="assets/style.css?v=0.4.0" />
+  <link rel="stylesheet" href="assets/style.css?v=0.4.1" />
 </head>
 <body>
   <header class="hero">
@@ -146,8 +146,34 @@
       renderList();
     });
 
-    fetch("assets/rune-data.json", { cache: "no-store" })
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    /* 数据文件多源加载（与掉落查询页同策略）：GitHub Pages 到国内线路对本站文件偏慢，
+       改走 jsDelivr 的 gcore 节点；每个源 12 秒超时，失败自动回退，最后回退同源。
+       版本号取自样式表链接的 ?v=，与发布流程自动同步。 */
+    var ASSET_V = (function () {
+      var l = document.querySelector('link[href*="style.css?v="]');
+      var m = l && l.getAttribute("href").match(/[?&]v=([\d.]+)/);
+      return m ? m[1] : "";
+    })();
+    var DATA_URLS = [
+      "https://gcore.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/rune-data.json?v=" + ASSET_V,
+      "https://cdn.jsdelivr.net/gh/Addons-SoD/wow-sod-wiki@main/assets/rune-data.json?v=" + ASSET_V,
+      "assets/rune-data.json?v=" + ASSET_V
+    ];
+    function loadRuneData() {
+      var i = 0;
+      function next() {
+        if (i >= DATA_URLS.length) return Promise.reject(new Error("所有数据源均不可用"));
+        var url = DATA_URLS[i++];
+        var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
+        return fetch(url, { cache: "no-store", signal: ctrl ? ctrl.signal : undefined })
+          .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+          .then(function (d) { clearTimeout(timer); return d; })
+          .catch(function () { clearTimeout(timer); return next(); });
+      }
+      return next();
+    }
+    loadRuneData()
       .then(function (d) {
         DATA = d;
         renderTabs(); renderSlots(); renderList();
